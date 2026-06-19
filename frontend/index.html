@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inventario de Perfumes | Google Sheets</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #64748b;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --ok: #16a34a;
+      --line: #e2e8f0;
+      --soft: #ecfdf5;
+      --shadow: 0 12px 30px rgba(15, 23, 42, .08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #eef8f6 0%, #f8fafc 42%, #fff7ed 100%);
+      color: var(--ink);
+    }
+    header {
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 18px 20px; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 46px; height: 46px; border-radius: 14px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, #0f766e, #14b8a6);
+      color: #fff; font-size: 24px; box-shadow: var(--shadow);
+    }
+    h1 { margin: 0; font-size: 26px; }
+    .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px;
+      background: #eff6ff; color: #1d4ed8; font-weight: 700; font-size: 13px;
+      border: 1px solid #bfdbfe;
+    }
+    .badge.ok { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .badge.warn { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    nav {
+      display: flex; gap: 8px; overflow-x: auto; padding-top: 14px;
+    }
+    .tab {
+      border: 1px solid var(--line); background: #fff; color: var(--ink);
+      border-radius: 999px; padding: 10px 15px; cursor: pointer;
+      font-weight: 700; white-space: nowrap;
+    }
+    .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    main { max-width: 1280px; margin: 0 auto; padding: 22px 20px 60px; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .grid { display: grid; gap: 16px; }
+    .grid.kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid.two { grid-template-columns: 1.1fr .9fr; }
+    @media (max-width: 900px) {
+      .grid.kpis, .grid.two { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .card h2, .card h3 { margin: 0 0 10px; }
+    .card p { color: var(--muted); margin: 0 0 14px; }
+    .kpi .label { color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi .value { margin-top: 8px; font-size: 30px; font-weight: 900; }
+    .kpi .hint { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    .toolbar {
+      display: flex; gap: 10px; align-items: end; flex-wrap: wrap;
+      margin: 12px 0 14px;
+    }
+    label { display: block; font-size: 13px; font-weight: 800; color: #334155; margin-bottom: 5px; }
+    input, select, textarea {
+      width: 100%; border: 1px solid #cbd5e1; border-radius: 12px;
+      padding: 10px 12px; font: inherit; background: #fff; color: var(--ink);
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(20,184,166,.12); }
+    .field { min-width: 170px; flex: 1; }
+    .field.small { min-width: 110px; flex: .6; }
+    button {
+      border: 0; border-radius: 12px; padding: 11px 14px;
+      font-weight: 900; cursor: pointer; font: inherit;
+      background: #e2e8f0; color: var(--ink);
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-danger { background: #fee2e2; color: var(--danger); }
+    .btn-warning { background: #ffedd5; color: #c2410c; }
+    .btn-ghost { background: #f8fafc; border: 1px solid var(--line); }
+    .btn-ok { background: #dcfce7; color: #15803d; }
+    .btn-sm { padding: 7px 9px; font-size: 12px; border-radius: 10px; }
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; min-width: 920px; }
+    th, td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    th { background: #f1f5f9; font-size: 12px; text-transform: uppercase; color: #475569; position: sticky; top: 0; z-index: 1; }
+    tr:hover td { background: #f8fafc; }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .pill { display: inline-flex; padding: 4px 8px; border-radius: 999px; font-weight: 800; font-size: 12px; }
+    .pill.f { background:#fce7f3; color:#be185d; }
+    .pill.m { background:#dbeafe; color:#1d4ed8; }
+    .pill.u { background:#ede9fe; color:#6d28d9; }
+    .pill.in { background:#dcfce7; color:#166534; }
+    .pill.out { background:#fee2e2; color:#991b1b; }
+    .pill.neutral { background:#f1f5f9; color:#475569; }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15,23,42,.42);
+      display: none; align-items: center; justify-content: center;
+      z-index: 50; padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: min(760px, 100%); max-height: 90vh; overflow: auto;
+      background: #fff; border-radius: 22px; box-shadow: 0 30px 80px rgba(15,23,42,.26);
+      border: 1px solid var(--line);
+    }
+    .modal header { position: static; border-bottom: 1px solid var(--line); padding: 18px; }
+    .modal .body { padding: 18px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 13px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+    .toast {
+      position: fixed; right: 20px; bottom: 20px; z-index: 80;
+      background: #0f172a; color: white; border-radius: 14px; padding: 13px 15px;
+      box-shadow: var(--shadow); display: none; max-width: 360px;
+    }
+    .toast.show { display: block; }
+    .bar-row { display: grid; grid-template-columns: 170px 1fr 90px; gap: 10px; align-items: center; margin: 9px 0; }
+    .bar { height: 12px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .bar span { display: block; height: 100%; background: linear-gradient(90deg, #0f766e, #14b8a6); border-radius: 999px; }
+    .notice { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; padding: 12px 14px; border-radius: 14px; margin-bottom: 14px; }
+    .empty { color: var(--muted); text-align: center; padding: 30px; }
+    .money { font-variant-numeric: tabular-nums; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">⚗️</div>
+          <div>
+            <h1>Inventario de Perfumes</h1>
+            <p class="subtitle">CRUD con Google Sheets, informes, migración mensual y control de stock por gramos.</p>
+          </div>
+        </div>
+        <div id="statusBadge" class="badge warn">⚠ Configura API_URL en el código</div>
+      </div>
+      <nav>
+        <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
+        <button class="tab" data-tab="productos">🧴 Perfumes</button>
+        <button class="tab" data-tab="movimientos">📦 Movimientos</button>
+        <button class="tab" data-tab="informes">📑 Informes</button>
+        <button class="tab" data-tab="migracion">🗂 Migración</button>
+        
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="dashboard" class="section active">
+      <div id="apiNotice" class="notice">
+        La URL de Apps Script está interna en el archivo. Reemplaza <b>API_URL</b> en este HTML por tu URL terminada en <b>/exec</b>. Mientras no la pegues, el sistema queda en vista local de prueba.
+      </div>
+      <div class="grid kpis">
+        <div class="card kpi"><div class="label">Productos</div><div class="value" id="kpiProductos">0</div><div class="hint">Fragancias registradas</div></div>
+        <div class="card kpi"><div class="label">Stock total</div><div class="value" id="kpiStock">0 gr</div><div class="hint">Gramos disponibles</div></div>
+        <div class="card kpi"><div class="label">Stock bajo</div><div class="value" id="kpiBajo">0</div><div class="hint">Bajo mínimo definido</div></div>
+        <div class="card kpi"><div class="label">Valor inventario</div><div class="value" id="kpiValor">$0</div><div class="hint">Stock × valor gramo</div></div>
+      </div>
+
+      <div class="grid two" style="margin-top:16px">
+        <div class="card">
+          <h2>Top stock por fragancia</h2>
+          <p>Visualiza los perfumes con mayor cantidad disponible.</p>
+          <div id="stockBars"></div>
+        </div>
+        <div class="card">
+          <h2>Resumen del mes</h2>
+          <p>Entradas, salidas y movimientos del mes actual.</p>
+          <div class="grid">
+            <div class="kpi"><div class="label">Movimientos mes</div><div class="value" id="kpiMovMes">0</div></div>
+            <div class="kpi"><div class="label">Compras / entradas</div><div class="value" id="kpiComprasMes">0 gr</div></div>
+            <div class="kpi"><div class="label">Ventas / salidas</div><div class="value" id="kpiSalidasMes">0 gr</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="productos" class="section">
+      <div class="card">
+        <h2>Registro de perfumes</h2>
+        <p>Agrega, edita o elimina perfumes. El stock se actualiza automáticamente con los movimientos.</p>
+        <div class="toolbar">
+          <div class="field"><label>Buscar</label><input id="buscarProducto" placeholder="Fragancia o ID"></div>
+          <div class="field small"><label>Tipo</label><select id="filtroTipoProducto"><option value="">Todos</option><option>F</option><option>M</option><option>U</option></select></div>
+          <button class="btn-primary" onclick="openProductModal()">➕ Agregar perfume</button>
+          <button class="btn-ghost" onclick="loadAll()">↻ Actualizar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Fragancia</th><th>Tipo</th><th class="right">Stock Gr</th><th class="right">Mínimo</th><th class="right">Valor gramo</th><th>Estado</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="productosBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="movimientos" class="section">
+      <div class="card">
+        <h2>Movimientos de inventario</h2>
+        <p>Registra compras, ventas, entradas, salidas, mermas y ajustes. Cada registro actualiza el stock del perfume.</p>
+        <div class="toolbar">
+          <div class="field"><label>Desde</label><input id="movDesde" type="date"></div>
+          <div class="field"><label>Hasta</label><input id="movHasta" type="date"></div>
+          <div class="field"><label>Tipo movimiento</label><select id="movTipo"><option value="">Todos</option><option>COMPRA</option><option>VENTA</option><option>ENTRADA</option><option>SALIDA</option><option>AJUSTE_ENTRADA</option><option>AJUSTE_SALIDA</option><option>MERMA</option><option>DEVOLUCION</option></select></div>
+          <button class="btn-primary" onclick="openMovementModal()">➕ Agregar movimiento</button>
+          <button class="btn-ghost" onclick="loadMovements()">Filtrar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Perfume</th><th>Tipo</th><th class="right">Cantidad</th><th class="right">Valor gramo</th><th class="right">IVA</th><th class="right">Total</th><th>Migrado</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="movimientosBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="informes" class="section">
+      <div class="card">
+        <h2>Generador de informes</h2>
+        <p>Filtra por rango de fechas, mes, año, tipo de movimiento, tipo de perfume o perfume específico.</p>
+        <div class="toolbar">
+          <div class="field"><label>Desde</label><input id="repDesde" type="date"></div>
+          <div class="field"><label>Hasta</label><input id="repHasta" type="date"></div>
+          <div class="field small"><label>Mes</label><select id="repMes"><option value="">Todos</option></select></div>
+          <div class="field small"><label>Año</label><input id="repAnio" type="number" min="2020" placeholder="2026"></div>
+          <div class="field"><label>Tipo movimiento</label><select id="repTipoMov"><option value="">Todos</option><option>COMPRA</option><option>VENTA</option><option>ENTRADA</option><option>SALIDA</option><option>AJUSTE_ENTRADA</option><option>AJUSTE_SALIDA</option><option>MERMA</option><option>DEVOLUCION</option></select></div>
+          <div class="field small"><label>Tipo perfume</label><select id="repTipoProducto"><option value="">Todos</option><option>F</option><option>M</option><option>U</option></select></div>
+          <button class="btn-primary" onclick="generateReport()">Generar informe</button>
+          <button class="btn-ok" onclick="downloadReportCsv()">⬇ CSV</button>
+          <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+        </div>
+      </div>
+
+      <div class="grid kpis" style="margin-top:16px">
+        <div class="card kpi"><div class="label">Registros</div><div class="value" id="repRegistros">0</div></div>
+        <div class="card kpi"><div class="label">Gramos</div><div class="value" id="repGramos">0</div></div>
+        <div class="card kpi"><div class="label">IVA</div><div class="value" id="repIva">$0</div></div>
+        <div class="card kpi"><div class="label">Total</div><div class="value" id="repTotal">$0</div></div>
+      </div>
+
+      <div class="grid two" style="margin-top:16px">
+        <div class="card">
+          <h3>Resumen por perfume</h3>
+          <div class="table-wrap"><table><thead><tr><th>Perfume</th><th class="right">Reg.</th><th class="right">Gramos</th><th class="right">Total</th></tr></thead><tbody id="repPorProducto"></tbody></table></div>
+        </div>
+        <div class="card">
+          <h3>Resumen por mes</h3>
+          <div class="table-wrap"><table><thead><tr><th>Mes</th><th class="right">Reg.</th><th class="right">Gramos</th><th class="right">Total</th></tr></thead><tbody id="repPorMes"></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Detalle del informe</h3>
+        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Perfume</th><th>Tipo</th><th class="right">Gramos</th><th class="right">Neto</th><th class="right">IVA</th><th class="right">Total</th></tr></thead><tbody id="repDetalle"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="migracion" class="section">
+      <div class="card">
+        <h2>Migración de registros</h2>
+        <p>Copia movimientos hacia hojas mensuales o por rango, y marca el registro original como migrado.</p>
+        <div class="toolbar">
+          <div class="field"><label>Desde</label><input id="migDesde" type="date"></div>
+          <div class="field"><label>Hasta</label><input id="migHasta" type="date"></div>
+          <div class="field small"><label>Mes</label><select id="migMes"><option value="">Todos</option></select></div>
+          <div class="field small"><label>Año</label><input id="migAnio" type="number" min="2020" placeholder="2026"></div>
+          <div class="field"><label>Tipo movimiento</label><select id="migTipoMov"><option value="">Todos</option><option>COMPRA</option><option>VENTA</option><option>ENTRADA</option><option>SALIDA</option><option>AJUSTE_ENTRADA</option><option>AJUSTE_SALIDA</option><option>MERMA</option><option>DEVOLUCION</option></select></div>
+          <div class="field small"><label>Tipo perfume</label><select id="migTipoProducto"><option value="">Todos</option><option>F</option><option>M</option><option>U</option></select></div>
+          <button class="btn-warning" onclick="runMigration()">🗂 Migrar</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Historial de migraciones</h3>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fecha</th><th>Criterio</th><th>Destino</th><th class="right">Registros</th><th class="right">Total</th></tr></thead><tbody id="migracionesBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="ayuda" class="section">
+      <div class="card">
+        <h2>Instalación rápida</h2>
+        <p>El sistema trabaja con Google Sheets como base de datos y Apps Script como API.</p>
+        <ol>
+          <li>Sube o crea una hoja de Google Sheets.</li>
+          <li>Abre <b>Extensiones &gt; Apps Script</b>.</li>
+          <li>Pega el archivo <b>appscript/Code.gs</b>.</li>
+          <li>Ejecuta <b>setupDatabase()</b> una vez para crear las hojas y cargar perfumes.</li>
+          <li>Implementa como <b>Aplicación web</b> con acceso “cualquier usuario con el enlace”.</li>
+          <li>Copia la URL terminada en <b>/exec</b> y reemplaza la constante <b>API_URL</b> en este HTML.</li>
+          <li>Sube la carpeta <b>frontend</b> a Vercel, Netlify o cualquier hosting estático.</li>
+        </ol>
+        <div class="notice">
+          Por seguridad, este archivo no trae tu URL real de Apps Script porque debe generarse desde tu cuenta de Google. La conexión queda interna en el código apenas pegues esa URL.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="productModal" class="modal-backdrop">
+    <div class="modal">
+      <header><h2 id="productModalTitle">Agregar perfume</h2></header>
+      <div class="body">
+        <input id="productId" type="hidden">
+        <div class="form-grid">
+          <div class="full"><label>Fragancia / Perfume *</label><input id="productFragancia" placeholder="Ej.: GOOD GIRL F"></div>
+          <div><label>Tipo</label><select id="productTipo"><option>F</option><option>M</option><option>U</option></select></div>
+          <div><label>Unidad Gr</label><input id="productUnidad" type="number" step="0.01" value="1"></div>
+          <div><label>Stock actual Gr</label><input id="productStock" type="number" step="0.01" value="0"></div>
+          <div><label>Stock mínimo Gr</label><input id="productMinimo" type="number" step="0.01" value="20"></div>
+          <div><label>Valor gramo</label><input id="productValor" type="number" step="0.01" value="1500"></div>
+          <div><label>IVA</label><input id="productIva" type="number" step="0.01" value="0.19"></div>
+          <div><label>Proveedor</label><input id="productProveedor" placeholder="Opcional"></div>
+          <div><label>Estado</label><select id="productEstado"><option>ACTIVO</option><option>INACTIVO</option></select></div>
+          <div class="full"><label>Observaciones</label><textarea id="productObs" rows="3"></textarea></div>
+        </div>
+        <div class="toolbar" style="justify-content:flex-end">
+          <button class="btn-ghost" onclick="closeModal('productModal')">Cancelar</button>
+          <button class="btn-primary" onclick="saveProduct()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="movementModal" class="modal-backdrop">
+    <div class="modal">
+      <header><h2 id="movementModalTitle">Agregar movimiento</h2></header>
+      <div class="body">
+        <input id="movementId" type="hidden">
+        <div class="form-grid">
+          <div><label>Fecha *</label><input id="movementFecha" type="date"></div>
+          <div><label>Tipo movimiento *</label><select id="movementTipo"><option>COMPRA</option><option>VENTA</option><option>ENTRADA</option><option>SALIDA</option><option>AJUSTE_ENTRADA</option><option>AJUSTE_SALIDA</option><option>MERMA</option><option>DEVOLUCION</option></select></div>
+          <div class="full"><label>Perfume *</label><select id="movementProducto"></select></div>
+          <div><label>Cantidad Gr *</label><input id="movementCantidad" type="number" step="0.01"></div>
+          <div><label>Valor gramo</label><input id="movementValor" type="number" step="0.01"></div>
+          <div><label>Usuario / responsable</label><input id="movementUsuario" placeholder="Opcional"></div>
+          <div class="full"><label>Observaciones</label><textarea id="movementObs" rows="3"></textarea></div>
+        </div>
+        <div class="toolbar" style="justify-content:flex-end">
+          <button class="btn-ghost" onclick="closeModal('movementModal')">Cancelar</button>
+          <button class="btn-primary" onclick="saveMovement()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+/**
+ * URL interna de Apps Script.
+ * Reemplazar por la URL de implementación terminada en /exec.
+ * Ejemplo:
+ * const API_URL = 'https://script.google.com/macros/s/AKfycbx.../exec';
+ */
+const API_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT_EXEC';
+
+const DEMO_PRODUCTS = [{"id": "PROD001", "fragancia": "1 MILLION RABANNE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD002", "fragancia": "212 CAOLINA HERRERA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD003", "fragancia": "212 CAROLINA HERRERA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD004", "fragancia": "212 VIP CAROLINA HERRERA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD005", "fragancia": "212 VIP ROSE CAROLINA HERRERA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD006", "fragancia": "360 PERRI ELLIS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD007", "fragancia": "360 PERRY ELLIS M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD008", "fragancia": "9 (NUEVE) PM AFNAN M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD009", "fragancia": "9PM REVEL U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD010", "fragancia": "AL NOBLE SAFFER U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD011", "fragancia": "AMATISTA U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD012", "fragancia": "AMBER OUD U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD013", "fragancia": "AMOR AMOR CHACHAREL F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD014", "fragancia": "ANGARA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD015", "fragancia": "ARABIAN TONKA U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD016", "fragancia": "ASAD LATTAFA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD017", "fragancia": "BADE AL OUD SUBLIME U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD018", "fragancia": "BAHARA ROUS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD019", "fragancia": "BFF KIM KARDASHIAN F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD020", "fragancia": "BLACK XS M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD021", "fragancia": "CANCAN PARIS HILTON F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD022", "fragancia": "CAROLINA HERRERA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD023", "fragancia": "CK ONE CALVIN KLEIN U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD024", "fragancia": "CLOUD ARIANA GRANDE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD025", "fragancia": "CLOUD PINK F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD026", "fragancia": "CLUB DE NIUT F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD027", "fragancia": "CLUB DE NUIT M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD028", "fragancia": "COCO MADEMOISLE CHANEL F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD029", "fragancia": "COCONUT F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD030", "fragancia": "COLORANTES F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD031", "fragancia": "CUPCAKE ROJO FEM F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD032", "fragancia": "DIESEL BLANCA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD033", "fragancia": "FANTASTY F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD034", "fragancia": "FEROMONAS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD035", "fragancia": "GAIA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD036", "fragancia": "GOD OF FIRE U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD037", "fragancia": "GOOD GIRL F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD038", "fragancia": "HAYA LATTAFA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD039", "fragancia": "HUGO BOSS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD040", "fragancia": "HUGO BOSS M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD041", "fragancia": "IL KAKUNO ILMIN U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD042", "fragancia": "IL ROSSO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD043", "fragancia": "INTENSE CAFÉ U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD044", "fragancia": "INVICTUS RABANNE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD045", "fragancia": "INVICTUS VICTORY ELIXIR RABANNE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD046", "fragancia": "JEAN PAUL M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD047", "fragancia": "KHAMRAH LATTAFA U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD048", "fragancia": "KING BHARARA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD049", "fragancia": "LA VIDA ES BELLA LANCOME F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD050", "fragancia": "LACOSTE RED M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD051", "fragancia": "LACOSTE WHITE L 12.12 M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD052", "fragancia": "LIGHT BLUE DOLCE GABBANA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD053", "fragancia": "LOCO LOEWE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD054", "fragancia": "MILLON LUKY M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD055", "fragancia": "MISS DIOR F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD056", "fragancia": "NITRO ELIXIR M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD057", "fragancia": "NITRO RED M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD058", "fragancia": "ODYSSEY MANDARIN SKY M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD059", "fragancia": "OMBRE NOMADE LOUIS VUITTONILMIN U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD060", "fragancia": "OMNIA CRISTALINE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD061", "fragancia": "PARADOXE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD062", "fragancia": "PARIS HILTON F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD063", "fragancia": "PASSPORT F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD064", "fragancia": "PERFUMEROS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD065", "fragancia": "RALPH F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD066", "fragancia": "SANTAL 33 U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD067", "fragancia": "SCADA SORBETO ROSSO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD068", "fragancia": "SCANDALOUS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD069", "fragancia": "SILVER MONTAIN WATER CREED U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD070", "fragancia": "SOLO LOEWE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD071", "fragancia": "TOMMY GIRL HILFIGER F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD072", "fragancia": "TOMMY TOMMY HILFIGER M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD073", "fragancia": "TOY 2 MOCHINO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD074", "fragancia": "TOY BOY MOCHINO M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD075", "fragancia": "ULTRAMALE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD076", "fragancia": "VAINILLA FREAK F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD077", "fragancia": "VALENTINO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD078", "fragancia": "VALENTINO M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD079", "fragancia": "VALENTINO UOMO BORIN ROMA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD080", "fragancia": "VERSACE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD081", "fragancia": "WASICE MEN M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD082", "fragancia": "YARA LATTAFA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD083", "fragancia": "YARA CANDY F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD084", "fragancia": "YUM YUM F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}];
+const DEMO_MOVEMENTS = [{"id": "MOV0001", "fecha": "2026-05-13", "productoId": "PROD035", "fragancia": "GAIA F", "tipoMovimiento": "COMPRA", "cantidadGr": 1, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0002", "fecha": "2026-05-13", "productoId": "PROD005", "fragancia": "212 VIP ROSE CAROLINA HERRERA F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0003", "fecha": "2026-05-13", "productoId": "PROD068", "fragancia": "SCANDALOUS F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0004", "fecha": "2026-05-13", "productoId": "PROD065", "fragancia": "RALPH F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0005", "fecha": "2026-05-13", "productoId": "PROD071", "fragancia": "TOMMY GIRL HILFIGER F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0006", "fecha": "2026-05-13", "productoId": "PROD021", "fragancia": "CANCAN PARIS HILTON F", "tipoMovimiento": "COMPRA", "cantidadGr": 5, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0007", "fecha": "2026-05-13", "productoId": "PROD003", "fragancia": "212 CAROLINA HERRERA M", "tipoMovimiento": "COMPRA", "cantidadGr": 6, "valorGramo": 1500, "observaciones": "Importado desde Excel"}];
+
+const state = {
+  products: [],
+  movements: [],
+  migraciones: [],
+  dashboard: {},
+  lastReport: null,
+  demo: API_URL.includes('PEGA_AQUI')
+};
+
+const fmtMoney = n => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(n || 0));
+const fmtNum = n => new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(Number(n || 0));
+const today = () => new Date().toISOString().slice(0,10);
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupTabs();
+  fillMonthSelects();
+  document.getElementById('movementFecha').value = today();
+  document.getElementById('buscarProducto').addEventListener('input', renderProducts);
+  document.getElementById('filtroTipoProducto').addEventListener('change', renderProducts);
+  document.getElementById('movementProducto').addEventListener('change', fillMovementPrice);
+  loadAll();
+});
+
+function setupTabs() {
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'informes' && !state.lastReport) generateReport();
+    });
+  });
+}
+
+function fillMonthSelects() {
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  ['repMes','migMes'].forEach(id => {
+    const s = document.getElementById(id);
+    months.forEach((m,i) => {
+      const opt = document.createElement('option');
+      opt.value = i + 1;
+      opt.textContent = m;
+      s.appendChild(opt);
+    });
+  });
+  document.getElementById('repAnio').value = new Date().getFullYear();
+  document.getElementById('migAnio').value = new Date().getFullYear();
+}
+
+async function loadAll() {
+  setStatus('Cargando...', 'warn');
+  try {
+    const res = await api('getInitialData', { limit: 500 });
+    state.products = res.productos || [];
+    state.movements = res.movimientos || [];
+    state.migraciones = res.migraciones || [];
+    state.dashboard = res.dashboard || computeDemoDashboard();
+    renderAll();
+    setStatus(state.demo ? 'Vista local de prueba' : 'Conectado a Google Sheets', state.demo ? 'warn' : 'ok');
+  } catch (err) {
+    toast('Error al cargar: ' + err.message);
+    setStatus('Error de conexión', 'warn');
+  }
+}
+
+async function loadMovements() {
+  const payload = {
+    desde: val('movDesde'),
+    hasta: val('movHasta'),
+    tipoMovimiento: val('movTipo')
+  };
+  const res = await api('listMovements', payload);
+  state.movements = res.movimientos || [];
+  renderMovements();
+  await refreshDashboard();
+}
+
+async function refreshDashboard() {
+  const res = await api('getDashboard', {});
+  state.dashboard = res.dashboard || computeDemoDashboard();
+  renderDashboard();
+}
+
+function renderAll() {
+  renderProducts();
+  renderMovements();
+  renderDashboard();
+  renderMigraciones();
+  fillProductSelect();
+}
+
+function renderDashboard() {
+  const d = state.dashboard || computeDemoDashboard();
+  text('kpiProductos', d.totalProductos || 0);
+  text('kpiStock', fmtNum(d.stockTotalGr) + ' gr');
+  text('kpiBajo', d.stockBajo || 0);
+  text('kpiValor', fmtMoney(d.valorInventario || 0));
+  text('kpiMovMes', d.movimientosMes || 0);
+  text('kpiComprasMes', fmtNum(d.comprasMesGr) + ' gr');
+  text('kpiSalidasMes', fmtNum(d.salidasMesGr) + ' gr');
+
+  const top = d.topStock || [];
+  const max = Math.max(1, ...top.map(p => Number(p.StockGr || 0)));
+  const box = document.getElementById('stockBars');
+  box.innerHTML = top.length ? top.map(p => `
+    <div class="bar-row">
+      <b title="${escapeHtml(p.Fragancia)}">${escapeHtml(short(p.Fragancia, 22))}</b>
+      <div class="bar"><span style="width:${Math.max(4, (Number(p.StockGr||0)/max)*100)}%"></span></div>
+      <span class="right">${fmtNum(p.StockGr)} gr</span>
+    </div>
+  `).join('') : '<div class="empty">Sin stock registrado todavía.</div>';
+}
+
+function renderProducts() {
+  const q = val('buscarProducto').toLowerCase();
+  const tipo = val('filtroTipoProducto');
+  let items = state.products.slice();
+  if (q) items = items.filter(p => String(p.Fragancia || '').toLowerCase().includes(q) || String(p.ID || '').toLowerCase().includes(q));
+  if (tipo) items = items.filter(p => p.Tipo === tipo);
+
+  const body = document.getElementById('productosBody');
+  body.innerHTML = items.length ? items.map(p => `
+    <tr>
+      <td><b>${escapeHtml(p.ID)}</b></td>
+      <td>${escapeHtml(p.Fragancia)}</td>
+      <td>${pillTipo(p.Tipo)}</td>
+      <td class="right">${fmtNum(p.StockGr)}</td>
+      <td class="right">${fmtNum(p.StockMinimoGr)}</td>
+      <td class="right money">${fmtMoney(p.ValorGramo)}</td>
+      <td>${escapeHtml(p.Estado || 'ACTIVO')}</td>
+      <td><div class="actions">
+        <button class="btn-sm btn-ghost" onclick='openProductModal(${JSON.stringify(p)})'>Editar</button>
+        <button class="btn-sm btn-danger" onclick="deleteProduct('${p.ID}')">Eliminar</button>
+      </div></td>
+    </tr>
+  `).join('') : '<tr><td colspan="8" class="empty">No hay perfumes registrados.</td></tr>';
+}
+
+function renderMovements() {
+  const body = document.getElementById('movimientosBody');
+  body.innerHTML = state.movements.length ? state.movements.map(m => `
+    <tr>
+      <td><b>${escapeHtml(m.ID)}</b></td>
+      <td>${escapeHtml(m.Fecha)}</td>
+      <td>${escapeHtml(m.Fragancia)}</td>
+      <td>${pillMovement(m.TipoMovimiento)}</td>
+      <td class="right">${fmtNum(m.CantidadGr)} gr</td>
+      <td class="right">${fmtMoney(m.ValorGramo)}</td>
+      <td class="right">${fmtMoney(m.IVA)}</td>
+      <td class="right"><b>${fmtMoney(m.Total)}</b></td>
+      <td>${escapeHtml(m.Migrado || 'NO')}</td>
+      <td><div class="actions">
+        <button class="btn-sm btn-ghost" onclick='openMovementModal(${JSON.stringify(m)})'>Editar</button>
+        <button class="btn-sm btn-danger" onclick="deleteMovement('${m.ID}')">Eliminar</button>
+      </div></td>
+    </tr>
+  `).join('') : '<tr><td colspan="10" class="empty">No hay movimientos registrados.</td></tr>';
+}
+
+async function generateReport() {
+  const payload = {
+    desde: val('repDesde'),
+    hasta: val('repHasta'),
+    mes: val('repMes'),
+    anio: val('repAnio'),
+    tipoMovimiento: val('repTipoMov'),
+    tipoProducto: val('repTipoProducto')
+  };
+  const res = await api('getReportes', payload);
+  state.lastReport = res;
+  const r = res.resumen || {};
+  text('repRegistros', r.registros || 0);
+  text('repGramos', fmtNum(r.totalGramos || 0));
+  text('repIva', fmtMoney(r.totalIVA || 0));
+  text('repTotal', fmtMoney(r.totalConIVA || 0));
+
+  renderGroup('repPorProducto', res.porProducto || [], 'nombre');
+  renderGroup('repPorMes', res.porMes || [], 'nombre');
+  const body = document.getElementById('repDetalle');
+  const det = res.movimientos || [];
+  body.innerHTML = det.length ? det.map(m => `
+    <tr><td>${escapeHtml(m.Fecha)}</td><td>${escapeHtml(m.Fragancia)}</td><td>${escapeHtml(m.TipoMovimiento)}</td><td class="right">${fmtNum(m.CantidadGr)}</td><td class="right">${fmtMoney(m.ValorInicial)}</td><td class="right">${fmtMoney(m.IVA)}</td><td class="right">${fmtMoney(m.Total)}</td></tr>
+  `).join('') : '<tr><td colspan="7" class="empty">Sin datos para los filtros seleccionados.</td></tr>';
+}
+
+function renderGroup(id, rows) {
+  const body = document.getElementById(id);
+  body.innerHTML = rows.length ? rows.slice(0, 50).map(r => `
+    <tr><td>${escapeHtml(r.nombre)}</td><td class="right">${r.registros}</td><td class="right">${fmtNum(r.totalGramos)}</td><td class="right">${fmtMoney(r.totalConIVA)}</td></tr>
+  `).join('') : '<tr><td colspan="4" class="empty">Sin datos.</td></tr>';
+}
+
+function renderMigraciones() {
+  const body = document.getElementById('migracionesBody');
+  body.innerHTML = state.migraciones.length ? state.migraciones.map(m => `
+    <tr>
+      <td><b>${escapeHtml(m.ID)}</b></td>
+      <td>${escapeHtml(m.FechaHora)}</td>
+      <td>${escapeHtml(m.Criterio || '')}</td>
+      <td>${escapeHtml(m.HojaDestino || '')}</td>
+      <td class="right">${fmtNum(m.TotalRegistros || 0)}</td>
+      <td class="right">${fmtMoney(m.TotalConIVA || 0)}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="6" class="empty">Aún no hay migraciones.</td></tr>';
+}
+
+function openProductModal(p = null) {
+  document.getElementById('productModalTitle').textContent = p ? 'Editar perfume' : 'Agregar perfume';
+  setVal('productId', p?.ID || '');
+  setVal('productFragancia', p?.Fragancia || '');
+  setVal('productTipo', p?.Tipo || 'U');
+  setVal('productUnidad', p?.UnidadGr ?? 1);
+  setVal('productStock', p?.StockGr ?? 0);
+  setVal('productMinimo', p?.StockMinimoGr ?? 20);
+  setVal('productValor', p?.ValorGramo ?? 1500);
+  setVal('productIva', p?.IVA ?? 0.19);
+  setVal('productProveedor', p?.Proveedor || '');
+  setVal('productEstado', p?.Estado || 'ACTIVO');
+  setVal('productObs', p?.Observaciones || '');
+  showModal('productModal');
+}
+
+async function saveProduct() {
+  const payload = {
+    id: val('productId'),
+    fragancia: val('productFragancia'),
+    tipo: val('productTipo'),
+    unidadGr: val('productUnidad'),
+    stockGr: val('productStock'),
+    stockMinimoGr: val('productMinimo'),
+    valorGramo: val('productValor'),
+    iva: val('productIva'),
+    proveedor: val('productProveedor'),
+    estado: val('productEstado'),
+    observaciones: val('productObs')
+  };
+  if (!payload.fragancia) return toast('Ingrese el nombre del perfume.');
+  const res = await api('saveProduct', payload);
+  toast(res.message || 'Guardado');
+  closeModal('productModal');
+  await loadAll();
+}
+
+async function deleteProduct(id) {
+  if (!confirm('¿Eliminar este perfume?')) return;
+  const res = await api('deleteProduct', { id });
+  toast(res.message || 'Eliminado');
+  await loadAll();
+}
+
+function openMovementModal(m = null) {
+  document.getElementById('movementModalTitle').textContent = m ? 'Editar movimiento' : 'Agregar movimiento';
+  fillProductSelect();
+  setVal('movementId', m?.ID || '');
+  setVal('movementFecha', m?.Fecha || today());
+  setVal('movementTipo', m?.TipoMovimiento || 'COMPRA');
+  setVal('movementProducto', m?.ProductoID || state.products[0]?.ID || '');
+  setVal('movementCantidad', m?.CantidadGr || '');
+  setVal('movementValor', m?.ValorGramo || '');
+  setVal('movementUsuario', m?.Usuario || '');
+  setVal('movementObs', m?.Observaciones || '');
+  fillMovementPrice();
+  showModal('movementModal');
+}
+
+function fillProductSelect() {
+  const sel = document.getElementById('movementProducto');
+  const current = sel.value;
+  sel.innerHTML = state.products
+    .filter(p => (p.Estado || 'ACTIVO') === 'ACTIVO')
+    .map(p => `<option value="${escapeHtml(p.ID)}">${escapeHtml(p.ID)} - ${escapeHtml(p.Fragancia)}</option>`).join('');
+  if (current) sel.value = current;
+}
+
+function fillMovementPrice() {
+  const id = val('movementProducto');
+  const p = state.products.find(x => x.ID === id);
+  if (p && !val('movementValor')) setVal('movementValor', p.ValorGramo || 0);
+}
+
+async function saveMovement() {
+  const payload = {
+    id: val('movementId'),
+    fecha: val('movementFecha'),
+    tipoMovimiento: val('movementTipo'),
+    productoId: val('movementProducto'),
+    cantidadGr: val('movementCantidad'),
+    valorGramo: val('movementValor'),
+    usuario: val('movementUsuario'),
+    observaciones: val('movementObs')
+  };
+  if (!payload.fecha || !payload.productoId || !payload.cantidadGr) return toast('Complete fecha, perfume y cantidad.');
+  const res = await api('saveMovement', payload);
+  toast(res.message || 'Movimiento guardado');
+  closeModal('movementModal');
+  await loadAll();
+}
+
+async function deleteMovement(id) {
+  if (!confirm('¿Eliminar este movimiento? Se reversará el stock.')) return;
+  const res = await api('deleteMovement', { id });
+  toast(res.message || 'Movimiento eliminado');
+  await loadAll();
+}
+
+async function runMigration() {
+  if (!confirm('¿Migrar los movimientos seleccionados? Se copiarán a una hoja nueva y se marcarán como migrados.')) return;
+  const payload = {
+    desde: val('migDesde'),
+    hasta: val('migHasta'),
+    mes: val('migMes'),
+    anio: val('migAnio'),
+    tipoMovimiento: val('migTipoMov'),
+    tipoProducto: val('migTipoProducto'),
+    modo: val('migMes') && val('migAnio') ? 'MES' : 'RANGO'
+  };
+  const res = await api('migrarMovimientos', payload);
+  toast(res.message || 'Migración ejecutada');
+  await loadAll();
+}
+
+function downloadReportCsv() {
+  if (!state.lastReport) return toast('Primero genere un informe.');
+  const rows = state.lastReport.movimientos || [];
+  const headers = ['Fecha','ProductoID','Fragancia','TipoProducto','TipoMovimiento','CantidadGr','ValorGramo','ValorInicial','IVA','Total','Migrado','Observaciones'];
+  const csv = [headers.join(';')].concat(rows.map(r => headers.map(h => csvCell(r[h])).join(';'))).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'informe_inventario_perfumes.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function api(action, payload = {}) {
+  if (state.demo) return demoApi(action, payload);
+  return new Promise((resolve, reject) => {
+    const callback = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('Tiempo de espera agotado al consultar Apps Script.'));
+    }, 25000);
+
+    window[callback] = (res) => {
+      cleanup();
+      if (res && res.ok === false) reject(new Error(res.message || res.error || 'Error en Apps Script'));
+      else resolve(res || {});
+    };
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[callback];
+      script.remove();
+    }
+
+    const url = API_URL + '?action=' + encodeURIComponent(action) + '&payload=' + encodeURIComponent(JSON.stringify(payload)) + '&callback=' + callback;
+    script.onerror = () => {
+      cleanup();
+      reject(new Error('No se pudo conectar con Apps Script. Revise API_URL.'));
+    };
+    script.src = url;
+    document.body.appendChild(script);
+  });
+}
+
+/* Modo local solo para previsualizar UI antes de pegar la URL /exec. Producción usa Google Sheets. */
+function demoApi(action, payload) {
+  initDemoDb();
+  const db = JSON.parse(localStorage.getItem('perfumeInventoryDemo'));
+  const save = () => localStorage.setItem('perfumeInventoryDemo', JSON.stringify(db));
+
+  const ok = (x={}) => Promise.resolve({ ok: true, ...x });
+  const productById = id => db.products.find(p => p.ID === id);
+  const nextId = (arr, prefix, digits) => prefix + String(arr.length + 1).padStart(digits, '0');
+  const sign = t => ['COMPRA','ENTRADA','AJUSTE_ENTRADA','DEVOLUCION'].includes(t) ? 1 : ['VENTA','SALIDA','AJUSTE_SALIDA','MERMA'].includes(t) ? -1 : 0;
+
+  if (action === 'getInitialData') return ok({ productos: db.products, movimientos: db.movements.slice().reverse(), migraciones: db.migraciones, dashboard: computeDashboard(db.products, db.movements) });
+  if (action === 'listMovements') return ok({ movimientos: filterDemoMovements(db.movements, payload).reverse() });
+  if (action === 'getDashboard') return ok({ dashboard: computeDashboard(db.products, db.movements) });
+  if (action === 'saveProduct') {
+    const id = payload.id || nextId(db.products, 'PROD', 3);
+    const idx = db.products.findIndex(p => p.ID === id);
+    const item = {
+      ID: id, Fragancia: String(payload.fragancia || '').toUpperCase(), Tipo: payload.tipo, UnidadGr: +payload.unidadGr || 1,
+      StockGr: +payload.stockGr || 0, StockMinimoGr: +payload.stockMinimoGr || 20, ValorGramo: +payload.valorGramo || 0,
+      IVA: +payload.iva || 0.19, Proveedor: payload.proveedor || '', Estado: payload.estado || 'ACTIVO',
+      FechaCreacion: today(), FechaActualizacion: today(), Observaciones: payload.observaciones || ''
+    };
+    if (idx >= 0) db.products[idx] = { ...db.products[idx], ...item }; else db.products.push(item);
+    save(); return ok({ producto: item, message: idx >= 0 ? 'Producto actualizado en vista local' : 'Producto agregado en vista local' });
+  }
+  if (action === 'deleteProduct') {
+    db.products = db.products.filter(p => p.ID !== payload.id); save(); return ok({ message: 'Producto eliminado en vista local' });
+  }
+  if (action === 'saveMovement') {
+    const id = payload.id || nextId(db.movements, 'MOV', 4);
+    const idx = db.movements.findIndex(m => m.ID === id);
+    if (idx >= 0) {
+      const old = db.movements[idx]; const pOld = productById(old.ProductoID); if (pOld) pOld.StockGr -= sign(old.TipoMovimiento) * Number(old.CantidadGr || 0);
+    }
+    const p = productById(payload.productoId);
+    const cantidad = +payload.cantidadGr || 0;
+    const valor = +payload.valorGramo || +p?.ValorGramo || 0;
+    const neto = cantidad * valor;
+    const iva = neto * (+p?.IVA || 0.19);
+    const d = new Date(payload.fecha + 'T00:00:00');
+    const item = {
+      ID: id, Fecha: payload.fecha, Hora: new Date().toLocaleTimeString(), ProductoID: payload.productoId, Fragancia: p?.Fragancia || '',
+      TipoProducto: p?.Tipo || 'U', TipoMovimiento: payload.tipoMovimiento, CantidadGr: cantidad, ValorGramo: valor,
+      ValorInicial: neto, IVA: iva, Total: neto + iva, Mes: d.getMonth()+1, Anio: d.getFullYear(),
+      Usuario: payload.usuario || '', Observaciones: payload.observaciones || '', Migrado: 'NO', FechaActualizacion: today()
+    };
+    if (p) p.StockGr += sign(item.TipoMovimiento) * cantidad;
+    if (idx >= 0) db.movements[idx] = item; else db.movements.push(item);
+    save(); return ok({ movimiento: item, message: idx >= 0 ? 'Movimiento actualizado en vista local' : 'Movimiento agregado en vista local' });
+  }
+  if (action === 'deleteMovement') {
+    const old = db.movements.find(m => m.ID === payload.id);
+    if (old) { const p = productById(old.ProductoID); if (p) p.StockGr -= sign(old.TipoMovimiento) * Number(old.CantidadGr || 0); }
+    db.movements = db.movements.filter(m => m.ID !== payload.id); save(); return ok({ message: 'Movimiento eliminado en vista local' });
+  }
+  if (action === 'getReportes') return ok(makeReport(filterDemoMovements(db.movements, payload), db.products));
+  if (action === 'migrarMovimientos') {
+    const rows = filterDemoMovements(db.movements, payload).filter(m => m.Migrado !== 'SI');
+    rows.forEach(m => m.Migrado = 'SI');
+    db.migraciones.unshift({ ID: nextId(db.migraciones, 'MIG', 4), FechaHora: new Date().toLocaleString(), Criterio: payload.modo || 'RANGO', HojaDestino: payload.mes ? `Migracion_${payload.anio}_${String(payload.mes).padStart(2,'0')}` : 'Migracion_Rango', TotalRegistros: rows.length, TotalConIVA: rows.reduce((s,m)=>s+Number(m.Total||0),0) });
+    save(); return ok({ message: `Migración local completada: ${rows.length} registros.` });
+  }
+  return ok();
+}
+
+function initDemoDb() {
+  if (localStorage.getItem('perfumeInventoryDemo')) return;
+  const products = DEMO_PRODUCTS.map(p => ({ ID: p.id, Fragancia: p.fragancia, Tipo: p.fragancia.trim().split(/\s+/).pop().match(/^[FMU]$/) ? p.fragancia.trim().split(/\s+/).pop() : 'U', UnidadGr: p.unidadGr, StockGr: 0, StockMinimoGr: 20, ValorGramo: p.valorGramo, IVA: p.iva, Proveedor: '', Estado: 'ACTIVO', FechaCreacion: today(), FechaActualizacion: today(), Observaciones: 'Importado desde Excel' }));
+  const movements = DEMO_MOVEMENTS.map(m => {
+    const p = products.find(x => x.ID === m.productoId);
+    const cantidad = Number(m.cantidadGr || 0), valor = Number(m.valorGramo || 0), neto = cantidad * valor, iva = neto * Number(p?.IVA || 0.19);
+    if (p) p.StockGr += cantidad;
+    const d = new Date(m.fecha + 'T00:00:00');
+    return { ID: m.id, Fecha: m.fecha, Hora: '08:00:00', ProductoID: m.productoId, Fragancia: m.fragancia, TipoProducto: p?.Tipo || 'U', TipoMovimiento: m.tipoMovimiento, CantidadGr: cantidad, ValorGramo: valor, ValorInicial: neto, IVA: iva, Total: neto + iva, Mes: d.getMonth()+1, Anio: d.getFullYear(), Usuario: 'Sistema', Observaciones: m.observaciones, Migrado: 'NO', FechaActualizacion: today() };
+  });
+  localStorage.setItem('perfumeInventoryDemo', JSON.stringify({ products, movements, migraciones: [] }));
+}
+
+function computeDemoDashboard() {
+  initDemoDb();
+  const db = JSON.parse(localStorage.getItem('perfumeInventoryDemo'));
+  return computeDashboard(db.products, db.movements);
+}
+
+function computeDashboard(products, movements) {
+  const now = new Date(), mes = now.getMonth()+1, anio = now.getFullYear();
+  const movMes = movements.filter(m => +m.Mes === mes && +m.Anio === anio);
+  const entradas = movMes.filter(m => ['COMPRA','ENTRADA','AJUSTE_ENTRADA','DEVOLUCION'].includes(m.TipoMovimiento));
+  const salidas = movMes.filter(m => ['VENTA','SALIDA','AJUSTE_SALIDA','MERMA'].includes(m.TipoMovimiento));
+  return {
+    totalProductos: products.length,
+    productosActivos: products.filter(p => p.Estado === 'ACTIVO').length,
+    stockTotalGr: products.reduce((s,p)=>s+Number(p.StockGr||0),0),
+    stockBajo: products.filter(p => Number(p.StockGr||0) <= Number(p.StockMinimoGr||0)).length,
+    movimientosMes: movMes.length,
+    comprasMesGr: entradas.reduce((s,m)=>s+Number(m.CantidadGr||0),0),
+    salidasMesGr: salidas.reduce((s,m)=>s+Number(m.CantidadGr||0),0),
+    valorInventario: products.reduce((s,p)=>s+(Number(p.StockGr||0)*Number(p.ValorGramo||0)),0),
+    topStock: products.slice().sort((a,b)=>Number(b.StockGr||0)-Number(a.StockGr||0)).slice(0,10)
+  };
+}
+
+function filterDemoMovements(rows, payload) {
+  return rows.filter(m => {
+    if (payload.desde && m.Fecha < payload.desde) return false;
+    if (payload.hasta && m.Fecha > payload.hasta) return false;
+    if (payload.mes && +m.Mes !== +payload.mes) return false;
+    if (payload.anio && +m.Anio !== +payload.anio) return false;
+    if (payload.tipoMovimiento && m.TipoMovimiento !== payload.tipoMovimiento) return false;
+    if (payload.tipoProducto && m.TipoProducto !== payload.tipoProducto) return false;
+    return true;
+  });
+}
+
+function makeReport(rows) {
+  const add = (map, key, m) => {
+    key = key || 'Sin clasificar';
+    map[key] ??= { nombre: key, registros: 0, totalGramos: 0, totalNeto: 0, totalIVA: 0, totalConIVA: 0 };
+    map[key].registros++; map[key].totalGramos += +m.CantidadGr || 0; map[key].totalNeto += +m.ValorInicial || 0; map[key].totalIVA += +m.IVA || 0; map[key].totalConIVA += +m.Total || 0;
+  };
+  const porProducto = {}, porMes = {}, porTipoMovimiento = {}, porTipoProducto = {};
+  const resumen = { registros: rows.length, totalGramos: 0, totalNeto: 0, totalIVA: 0, totalConIVA: 0 };
+  rows.forEach(m => { resumen.totalGramos += +m.CantidadGr||0; resumen.totalNeto += +m.ValorInicial||0; resumen.totalIVA += +m.IVA||0; resumen.totalConIVA += +m.Total||0; add(porProducto,m.Fragancia,m); add(porMes,`${m.Anio}-${String(m.Mes).padStart(2,'0')}`,m); add(porTipoMovimiento,m.TipoMovimiento,m); add(porTipoProducto,m.TipoProducto,m); });
+  const arr = o => Object.values(o).sort((a,b)=>b.totalConIVA-a.totalConIVA);
+  return { resumen, porProducto: arr(porProducto), porMes: arr(porMes), porTipoMovimiento: arr(porTipoMovimiento), porTipoProducto: arr(porTipoProducto), movimientos: rows.slice().reverse() };
+}
+
+function pillTipo(t) { return `<span class="pill ${String(t || 'u').toLowerCase()}">${escapeHtml(t || 'U')}</span>`; }
+function pillMovement(t) { const pos = ['COMPRA','ENTRADA','AJUSTE_ENTRADA','DEVOLUCION'].includes(t); const neg = ['VENTA','SALIDA','AJUSTE_SALIDA','MERMA'].includes(t); return `<span class="pill ${pos ? 'in' : neg ? 'out' : 'neutral'}">${escapeHtml(t || '')}</span>`; }
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function val(id) { return document.getElementById(id).value; }
+function setVal(id, value) { document.getElementById(id).value = value ?? ''; }
+function text(id, value) { document.getElementById(id).textContent = value; }
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3800); }
+function setStatus(msg, mode) { const b = document.getElementById('statusBadge'); b.className = 'badge ' + (mode || ''); b.textContent = (mode === 'ok' ? '✅ ' : mode === 'warn' ? '⚠ ' : '') + msg; document.getElementById('apiNotice').classList.toggle('hidden', !state.demo); }
+function escapeHtml(x) { return String(x ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+function short(s, n) { s = String(s || ''); return s.length > n ? s.slice(0,n-1) + '…' : s; }
+function csvCell(v) { v = String(v ?? '').replace(/"/g, '""'); return `"${v}"`; }
+</script>
+</body>
+</html>
