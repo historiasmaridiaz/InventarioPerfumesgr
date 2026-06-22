@@ -153,6 +153,136 @@
     .empty { color: var(--muted); text-align: center; padding: 30px; }
     .money { font-variant-numeric: tabular-nums; }
     .hidden { display: none !important; }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,.55);
+      border-top-color: #fff;
+      border-radius: 999px;
+      display: inline-block;
+      vertical-align: -3px;
+      margin-right: 8px;
+      animation: spin .75s linear infinite;
+    }
+    .btn-loading,
+    button:disabled {
+      opacity: .75;
+      cursor: not-allowed;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast.ok { background: #065f46; }
+    .toast.error { background: #991b1b; }
+    .toast.warn { background: #9a3412; }
+    .history-json {
+      white-space: pre-wrap;
+      background: #0f172a;
+      color: #e5e7eb;
+      border-radius: 14px;
+      padding: 12px;
+      max-height: 360px;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .history-muted { color: var(--muted); font-size: 12px; }
+    .combo { position: relative; }
+    .combo input { padding-right: 42px; }
+    .combo::after {
+      content: '⌕';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-weight: 900;
+    }
+    .combo-results {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 6px);
+      z-index: 120;
+      display: none;
+      max-height: 290px;
+      overflow: auto;
+      background: var(--card);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 18px 45px rgba(15,23,42,.18);
+    }
+    .combo-results.show { display: block; }
+    .combo-option {
+      padding: 11px 13px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+    }
+    .combo-option:last-child { border-bottom: 0; }
+    .combo-option:hover,
+    .combo-option.active { background: rgba(20,184,166,.14); }
+    .combo-option b { display: block; font-size: 14px; }
+    .combo-option small { display: block; color: var(--muted); margin-top: 2px; }
+    .combo-empty {
+      padding: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .combo-hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+
+
+    .manual-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .manual-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (max-width: 900px) { .manual-grid, .manual-grid.three { grid-template-columns: 1fr; } }
+    .manual-card { background: rgba(248,250,252,.85); border: 1px solid var(--line); border-radius: 16px; padding: 15px; }
+    .manual-card h3 { margin: 0 0 8px; }
+    .manual-card ul, .manual-card ol { margin: 8px 0 0; padding-left: 21px; color: var(--ink); }
+    .manual-card li { margin: 6px 0; line-height: 1.45; }
+    .formula-box { background: #ecfdf5; border: 1px solid #99f6e4; color: #134e4a; border-radius: 14px; padding: 13px 15px; font-weight: 800; margin: 10px 0; }
+    .manual-table { min-width: 0; }
+    .manual-table th, .manual-table td { white-space: normal; }
+    .manual-note { background: #eff6ff; color: #1e3a8a; border: 1px solid #bfdbfe; padding: 12px 14px; border-radius: 14px; margin: 12px 0; }
+    .manual-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 12px 14px; border-radius: 14px; margin: 12px 0; }
+    body[data-theme="dark"] .manual-card { background: rgba(15,23,42,.72); border-color: var(--line); }
+    body[data-theme="dark"] .formula-box { background: rgba(20,184,166,.12); color: var(--ink); border-color: var(--line); }
+    body[data-theme="dark"] .manual-note { background: rgba(37,99,235,.12); color: var(--ink); border-color: var(--line); }
+    body[data-theme="dark"] .manual-danger { background: rgba(220,38,38,.12); color: var(--ink); border-color: var(--line); }
+
+    .color-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+    @media (max-width: 900px) { .color-grid { grid-template-columns: 1fr; } }
+    .preview-box {
+      border: 1px solid var(--line); border-radius: var(--radius); padding: 18px;
+      background: var(--card); color: var(--ink); min-height: 150px;
+    }
+    .preview-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top: 12px; }
+    body[data-theme="dark"] { background: var(--bg); color: var(--ink); }
+    body[data-theme="dark"] header { background: rgba(17,24,39,.94); border-color: var(--line); }
+    body[data-theme="dark"] .card,
+    body[data-theme="dark"] .modal,
+    body[data-theme="dark"] .table-wrap { background: var(--card); border-color: var(--line); color: var(--ink); }
+    body[data-theme="dark"] .card p,
+    body[data-theme="dark"] .subtitle,
+    body[data-theme="dark"] .hint,
+    body[data-theme="dark"] .empty { color: var(--muted); }
+    body[data-theme="dark"] input,
+    body[data-theme="dark"] select,
+    body[data-theme="dark"] textarea { background: #0b1220; color: var(--ink); border-color: var(--line); }
+    body[data-theme="dark"] label { color: var(--ink); }
+    body[data-theme="dark"] table { background: var(--card); color: var(--ink); }
+    body[data-theme="dark"] th { background: #0b1220; color: var(--muted); }
+    body[data-theme="dark"] td { border-color: var(--line); }
+    body[data-theme="dark"] tr:hover td { background: rgba(148,163,184,.08); }
+    body[data-theme="dark"] .tab { background: #0b1220; color: var(--ink); border-color: var(--line); }
+    body[data-theme="dark"] .tab.active { background: var(--primary); color: #fff; }
+    body[data-theme="dark"] .btn-ghost { background: #0b1220; color: var(--ink); border-color: var(--line); }
+
   </style>
 </head>
 <body>
@@ -166,7 +296,7 @@
             <p class="subtitle">CRUD con Google Sheets, informes, migración mensual y control de stock por gramos.</p>
           </div>
         </div>
-        <div id="statusBadge" class="badge warn">⚠ Configura API_URL en el código</div>
+        <div id="statusBadge" class="badge warn">⚠ Abre desde Apps Script o configura API_URL</div>
       </div>
       <nav>
         <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
@@ -174,6 +304,9 @@
         <button class="tab" data-tab="movimientos">📦 Movimientos</button>
         <button class="tab" data-tab="informes">📑 Informes</button>
         <button class="tab" data-tab="migracion">🗂 Migración</button>
+        <button class="tab" data-tab="historial">🕘 Historial</button>
+        <button class="tab" data-tab="personalizacion">🎨 Personalización</button>
+        <button class="tab" data-tab="instrucciones">📘 Instrucciones</button>
         
       </nav>
     </div>
@@ -182,7 +315,10 @@
   <main>
     <section id="dashboard" class="section active">
       <div id="apiNotice" class="notice">
-        La URL de Apps Script está interna en el archivo. Reemplaza <b>API_URL</b> en este HTML por tu URL terminada en <b>/exec</b>. Mientras no la pegues, el sistema queda en vista local de prueba.
+        Para guardar en Google Sheets, abre esta interfaz desde la URL /exec de Apps Script. Si estás abriendo el HTML como archivo local, debes pegar la URL /exec en API_URL. Mientras no haya conexión, queda en vista local de prueba.
+        <div class="toolbar" style="margin:10px 0 0">
+          <button class="btn-ghost" type="button" onclick="checkConnection(this)">🔌 Comprobar conexión</button>
+        </div>
       </div>
       <div class="grid kpis">
         <div class="card kpi"><div class="label">Productos</div><div class="value" id="kpiProductos">0</div><div class="hint">Fragancias registradas</div></div>
@@ -268,7 +404,7 @@
           <div class="field"><label>Tipo movimiento</label><select id="repTipoMov"><option value="">Todos</option><option>COMPRA</option><option>VENTA</option><option>ENTRADA</option><option>SALIDA</option><option>AJUSTE_ENTRADA</option><option>AJUSTE_SALIDA</option><option>MERMA</option><option>DEVOLUCION</option></select></div>
           <div class="field small"><label>Tipo perfume</label><select id="repTipoProducto"><option value="">Todos</option><option>F</option><option>M</option><option>U</option></select></div>
           <button class="btn-primary" onclick="generateReport()">Generar informe</button>
-          <button class="btn-ok" onclick="downloadReportCsv()">⬇ CSV</button>
+          <button class="btn-ok" onclick="downloadReportExcel(this)">⬇ Excel detallado</button>
           <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
         </div>
       </div>
@@ -308,12 +444,261 @@
           <div class="field small"><label>Año</label><input id="migAnio" type="number" min="2020" placeholder="2026"></div>
           <div class="field"><label>Tipo movimiento</label><select id="migTipoMov"><option value="">Todos</option><option>COMPRA</option><option>VENTA</option><option>ENTRADA</option><option>SALIDA</option><option>AJUSTE_ENTRADA</option><option>AJUSTE_SALIDA</option><option>MERMA</option><option>DEVOLUCION</option></select></div>
           <div class="field small"><label>Tipo perfume</label><select id="migTipoProducto"><option value="">Todos</option><option>F</option><option>M</option><option>U</option></select></div>
-          <button class="btn-warning" onclick="runMigration()">🗂 Migrar</button>
+          <button id="migrationRunBtn" class="btn-warning" onclick="runMigration()">🗂 Migrar</button>
         </div>
       </div>
       <div class="card" style="margin-top:16px">
         <h3>Historial de migraciones</h3>
         <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fecha</th><th>Criterio</th><th>Destino</th><th class="right">Registros</th><th class="right">Total</th></tr></thead><tbody id="migracionesBody"></tbody></table></div>
+      </div>
+    </section>
+
+
+    <section id="historial" class="section">
+      <div class="card">
+        <h2>Historial de cambios</h2>
+        <p>Consulta los cambios realizados en productos y movimientos. Desde aquí puedes restaurar versiones anteriores por fecha.</p>
+        <div class="toolbar">
+          <div class="field"><label>Desde</label><input id="histDesde" type="date"></div>
+          <div class="field"><label>Hasta</label><input id="histHasta" type="date"></div>
+          <div class="field"><label>Acción</label><select id="histAccion"><option value="">Todas</option><option>AGREGAR</option><option>EDITAR</option><option>ELIMINAR</option><option>RESTAURAR</option></select></div>
+          <div class="field"><label>Módulo</label><select id="histModulo"><option value="">Todos</option><option>Productos</option><option>Movimientos</option></select></div>
+          <div class="field"><label>Buscar</label><input id="histBuscar" placeholder="ID, perfume, usuario o detalle"></div>
+          <button class="btn-primary" onclick="loadHistorial()">Buscar historial</button>
+          <button class="btn-ghost" onclick="clearHistorialFilters()">Limpiar</button>
+        </div>
+        <div class="notice">
+          Para restaurar, el sistema toma la versión anterior guardada en la hoja <b>Historial</b>. En movimientos también ajusta el stock automáticamente.
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Acción</th><th>Módulo</th><th>Registro</th><th>Detalle</th><th>Restaurado</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="historialBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="personalizacion" class="section">
+      <div class="grid two">
+        <div class="card">
+          <h2>Personalización del aplicativo</h2>
+          <p>Configura nombre, colores, fondo, moneda y modo visual. Estos cambios se guardan en la hoja <b>Personalizacion</b>.</p>
+          <div class="form-grid">
+            <div><label>Nombre del aplicativo</label><input id="settingAppName" placeholder="Inventario de Perfumes"></div>
+            <div><label>Logo / icono</label><input id="settingLogoEmoji" placeholder="⚗️"></div>
+            <div><label>Modo</label><select id="settingThemeMode"><option value="light">Claro</option><option value="dark">Oscuro</option></select></div>
+            <div><label>Moneda</label><input id="settingCurrencyCode" placeholder="COP" maxlength="3"></div>
+            <div><label>Locale</label><input id="settingLocale" placeholder="es-CO"></div>
+            <div><label>Redondeo px</label><input id="settingRadiusPx" type="number" min="0" max="40" step="1"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Vista previa</h2>
+          <p>Así se verá el tema antes de guardarlo.</p>
+          <div class="preview-box" id="themePreviewBox">
+            <h3 id="themePreviewTitle">Inventario de Perfumes</h3>
+            <p>Tarjeta de ejemplo con texto, borde, fondo y botón principal.</p>
+            <div class="preview-actions">
+              <button class="btn-primary" type="button">Botón principal</button>
+              <button class="btn-ghost" type="button">Botón secundario</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Colores</h3>
+        <div class="color-grid">
+          <div><label>Color principal</label><input id="settingPrimaryColor" type="color"></div>
+          <div><label>Color principal hover</label><input id="settingPrimaryDarkColor" type="color"></div>
+          <div><label>Color secundario</label><input id="settingSecondaryColor" type="color"></div>
+          <div><label>Fondo claro</label><input id="settingBackgroundColor" type="color"></div>
+          <div><label>Tarjetas claro</label><input id="settingCardColor" type="color"></div>
+          <div><label>Texto claro</label><input id="settingTextColor" type="color"></div>
+          <div><label>Bordes claro</label><input id="settingBorderColor" type="color"></div>
+          <div><label>Fondo oscuro</label><input id="settingDarkBackgroundColor" type="color"></div>
+          <div><label>Tarjetas oscuro</label><input id="settingDarkCardColor" type="color"></div>
+          <div><label>Texto oscuro</label><input id="settingDarkTextColor" type="color"></div>
+          <div><label>Bordes oscuro</label><input id="settingDarkBorderColor" type="color"></div>
+          <div><label>Color acento</label><input id="settingAccentColor" type="color"></div>
+        </div>
+        <div class="toolbar" style="justify-content:flex-end">
+          <button class="btn-ghost" onclick="toggleThemeMode()">Cambiar claro/oscuro</button>
+          <button class="btn-warning" onclick="resetPersonalizacion()">Restaurar tema</button>
+          <button class="btn-primary" onclick="savePersonalizacion()">Guardar personalización</button>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="instrucciones" class="section">
+      <div class="card">
+        <h2>Manual de funcionamiento del inventario</h2>
+        <p>Esta sección explica para qué sirve cada módulo y cómo afectan los movimientos al stock, a los valores y a los informes.</p>
+        <div class="manual-note">
+          Fórmula principal del inventario: cada perfume maneja stock en gramos. Los movimientos de entrada suman gramos al stock y los movimientos de salida restan gramos al stock.
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Movimientos: qué suma, qué resta y qué calcula</h2>
+        <p>Cuando guardas un movimiento, el sistema busca el perfume seleccionado, toma la cantidad en gramos y actualiza el stock automáticamente.</p>
+        <div class="formula-box">
+          Valor neto = Cantidad en gramos × Valor por gramo<br>
+          IVA = Valor neto × Porcentaje IVA del perfume<br>
+          Total = Valor neto + IVA<br>
+          Stock nuevo = Stock actual ± Cantidad en gramos
+        </div>
+        <div class="table-wrap">
+          <table class="manual-table">
+            <thead>
+              <tr><th>Tipo de movimiento</th><th>Efecto en stock</th><th>Uso recomendado</th><th>Ejemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>COMPRA</b></td>
+                <td>Suma stock</td>
+                <td>Cuando compras perfume o materia prima y entra inventario.</td>
+                <td>Stock 20 gr + compra 50 gr = 70 gr.</td>
+              </tr>
+              <tr>
+                <td><b>ENTRADA</b></td>
+                <td>Suma stock</td>
+                <td>Cuando entra producto por reposición, traslado, corrección o ingreso no registrado como compra.</td>
+                <td>Stock 10 gr + entrada 15 gr = 25 gr.</td>
+              </tr>
+              <tr>
+                <td><b>AJUSTE_ENTRADA</b></td>
+                <td>Suma stock</td>
+                <td>Cuando el conteo físico tiene más gramos que el sistema y necesitas corregir a favor.</td>
+                <td>Sistema 80 gr, físico 85 gr: ajuste entrada 5 gr.</td>
+              </tr>
+              <tr>
+                <td><b>DEVOLUCION</b></td>
+                <td>Suma stock</td>
+                <td>Cuando un producto vendido o retirado vuelve al inventario.</td>
+                <td>Stock 30 gr + devolución 10 gr = 40 gr.</td>
+              </tr>
+              <tr>
+                <td><b>VENTA</b></td>
+                <td>Resta stock</td>
+                <td>Cuando vendes gramos de un perfume.</td>
+                <td>Stock 100 gr - venta 12 gr = 88 gr.</td>
+              </tr>
+              <tr>
+                <td><b>SALIDA</b></td>
+                <td>Resta stock</td>
+                <td>Cuando sale producto sin registrarlo como venta, por ejemplo muestra, traslado o uso interno.</td>
+                <td>Stock 50 gr - salida 5 gr = 45 gr.</td>
+              </tr>
+              <tr>
+                <td><b>AJUSTE_SALIDA</b></td>
+                <td>Resta stock</td>
+                <td>Cuando el conteo físico tiene menos gramos que el sistema y necesitas corregir.</td>
+                <td>Sistema 60 gr, físico 55 gr: ajuste salida 5 gr.</td>
+              </tr>
+              <tr>
+                <td><b>MERMA</b></td>
+                <td>Resta stock</td>
+                <td>Cuando hay pérdida, evaporación, daño, derrame o producto no recuperable.</td>
+                <td>Stock 40 gr - merma 3 gr = 37 gr.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="manual-danger">
+          Si editas o eliminas un movimiento, el sistema reversa el efecto anterior y aplica el nuevo cambio. Por eso el historial es importante para poder restaurar registros si hubo un error.
+        </div>
+      </div>
+
+      <div class="manual-grid" style="margin-top:16px">
+        <div class="card manual-card">
+          <h3>Dashboard</h3>
+          <ul>
+            <li>Muestra la cantidad de perfumes registrados.</li>
+            <li>Muestra el stock total en gramos.</li>
+            <li>Muestra perfumes con stock bajo según el mínimo configurado.</li>
+            <li>Muestra el valor estimado del inventario: stock × valor por gramo.</li>
+            <li><b>Comprobar conexión</b> revisa si el HTML está conectado a Apps Script y Google Sheets.</li>
+          </ul>
+        </div>
+        <div class="card manual-card">
+          <h3>Perfumes</h3>
+          <ul>
+            <li><b>Agregar perfume:</b> crea una fragancia nueva con tipo, stock, valor por gramo, IVA, proveedor y estado.</li>
+            <li><b>Editar:</b> modifica datos del perfume. El cambio queda guardado en Historial.</li>
+            <li><b>Eliminar:</b> elimina o desactiva el registro según el backend. El cambio queda en Historial.</li>
+            <li><b>Actualizar:</b> vuelve a cargar datos desde Google Sheets.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="manual-grid three" style="margin-top:16px">
+        <div class="card manual-card">
+          <h3>Movimientos</h3>
+          <ul>
+            <li>Registra entradas y salidas de inventario.</li>
+            <li>Permite buscar el perfume escribiendo ID o nombre.</li>
+            <li>Calcula neto, IVA y total.</li>
+            <li>Actualiza stock de forma automática.</li>
+            <li>Guarda el cambio en la hoja Historial.</li>
+          </ul>
+        </div>
+        <div class="card manual-card">
+          <h3>Informes</h3>
+          <ul>
+            <li><b>Generar informe:</b> filtra por fecha, mes, año, tipo de movimiento y tipo de perfume.</li>
+            <li><b>Excel detallado:</b> descarga un archivo Excel con filtros, resumen general, totales, tablas por tipo, por perfume, por mes y detalle completo.</li>
+            <li><b>Imprimir:</b> abre la impresión del informe visible.</li>
+          </ul>
+        </div>
+        <div class="card manual-card">
+          <h3>Migración</h3>
+          <ul>
+            <li>Copia movimientos filtrados a una hoja nueva mensual o por rango.</li>
+            <li>Marca los registros originales como migrados.</li>
+            <li>No debe usarse para duplicar ventas; se usa para organizar o cerrar periodos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="manual-grid" style="margin-top:16px">
+        <div class="card manual-card">
+          <h3>Historial y restauración</h3>
+          <ul>
+            <li>Guarda cambios de agregar, editar, eliminar y restaurar.</li>
+            <li>Puedes filtrar por fecha, acción, módulo o texto.</li>
+            <li><b>Ver:</b> muestra el antes y después del cambio.</li>
+            <li><b>Restaurar:</b> toma la versión anterior y la vuelve a aplicar en la base de datos.</li>
+            <li>En movimientos, al restaurar también se ajusta el stock automáticamente.</li>
+          </ul>
+        </div>
+        <div class="card manual-card">
+          <h3>Personalización</h3>
+          <ul>
+            <li>Cambia nombre del aplicativo, icono, moneda, locale y redondeo.</li>
+            <li>Cambia colores de fondo, tarjetas, texto, bordes y botones.</li>
+            <li><b>Cambiar claro/oscuro:</b> alterna el modo visual.</li>
+            <li><b>Restaurar tema:</b> vuelve a colores iniciales.</li>
+            <li><b>Guardar personalización:</b> guarda el tema en Google Sheets.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Ejemplo práctico de cálculo</h2>
+        <p>Supongamos que un perfume tiene valor por gramo de 1.500 y el IVA configurado es 0.19.</p>
+        <div class="formula-box">
+          Cantidad = 10 gr<br>
+          Valor neto = 10 × 1.500 = 15.000<br>
+          IVA = 15.000 × 0.19 = 2.850<br>
+          Total = 15.000 + 2.850 = 17.850
+        </div>
+        <p>Si el movimiento es <b>COMPRA</b>, esos 10 gr se suman al stock. Si el movimiento es <b>VENTA</b>, esos 10 gr se restan del stock.</p>
       </div>
     </section>
 
@@ -324,10 +709,11 @@
         <ol>
           <li>Sube o crea una hoja de Google Sheets.</li>
           <li>Abre <b>Extensiones &gt; Apps Script</b>.</li>
-          <li>Pega el archivo <b>appscript/Code.gs</b>.</li>
-          <li>Ejecuta <b>setupDatabase()</b> una vez para crear las hojas y cargar perfumes.</li>
+          <li>Pega el archivo <b>Code_InventarioPerfumes.gs</b> en <b>Code.gs</b>.</li>
+          <li>Ejecuta <b>configurarInventario()</b> una vez para crear las hojas.</li>
+          <li>Ejecuta <b>cargarDatosSemilla()</b> para cargar el catálogo y los movimientos iniciales.</li>
           <li>Implementa como <b>Aplicación web</b> con acceso “cualquier usuario con el enlace”.</li>
-          <li>Copia la URL terminada en <b>/exec</b> y reemplaza la constante <b>API_URL</b> en este HTML.</li>
+          <li>Opción recomendada: abre directamente la URL terminada en <b>/exec</b>. Opción externa: copia esa URL y pégala en <b>API_URL</b> dentro del HTML.</li>
           <li>Sube la carpeta <b>frontend</b> a Vercel, Netlify o cualquier hosting estático.</li>
         </ol>
         <div class="notice">
@@ -356,7 +742,7 @@
         </div>
         <div class="toolbar" style="justify-content:flex-end">
           <button class="btn-ghost" onclick="closeModal('productModal')">Cancelar</button>
-          <button class="btn-primary" onclick="saveProduct()">Guardar</button>
+          <button id="productSaveBtn" class="btn-primary" onclick="saveProduct()">Guardar</button>
         </div>
       </div>
     </div>
@@ -370,7 +756,15 @@
         <div class="form-grid">
           <div><label>Fecha *</label><input id="movementFecha" type="date"></div>
           <div><label>Tipo movimiento *</label><select id="movementTipo"><option>COMPRA</option><option>VENTA</option><option>ENTRADA</option><option>SALIDA</option><option>AJUSTE_ENTRADA</option><option>AJUSTE_SALIDA</option><option>MERMA</option><option>DEVOLUCION</option></select></div>
-          <div class="full"><label>Perfume *</label><select id="movementProducto"></select></div>
+          <div class="full">
+            <label>Perfume *</label>
+            <div class="combo" id="movementProductoCombo">
+              <input id="movementProductoSearch" type="text" placeholder="Escribe ID o nombre del perfume..." autocomplete="off">
+              <input id="movementProducto" type="hidden">
+              <div id="movementProductoResults" class="combo-results"></div>
+            </div>
+            <div id="movementProductoHint" class="combo-hint">Escribe para buscar y selecciona un perfume.</div>
+          </div>
           <div><label>Cantidad Gr *</label><input id="movementCantidad" type="number" step="0.01"></div>
           <div><label>Valor gramo</label><input id="movementValor" type="number" step="0.01"></div>
           <div><label>Usuario / responsable</label><input id="movementUsuario" placeholder="Opcional"></div>
@@ -378,7 +772,19 @@
         </div>
         <div class="toolbar" style="justify-content:flex-end">
           <button class="btn-ghost" onclick="closeModal('movementModal')">Cancelar</button>
-          <button class="btn-primary" onclick="saveMovement()">Guardar</button>
+          <button id="movementSaveBtn" class="btn-primary" onclick="saveMovement()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="historyDetailModal" class="modal-backdrop">
+    <div class="modal">
+      <header><h2>Detalle del historial</h2></header>
+      <div class="body">
+        <div id="historyDetailContent" class="history-json"></div>
+        <div class="toolbar" style="justify-content:flex-end">
+          <button class="btn-ghost" onclick="closeModal('historyDetailModal')">Cerrar</button>
         </div>
       </div>
     </div>
@@ -388,27 +794,57 @@
 
 <script>
 /**
- * URL interna de Apps Script.
- * Reemplazar por la URL de implementación terminada en /exec.
+ * URL opcional de Apps Script.
+ * Si pegas este HTML dentro del proyecto Apps Script como archivo index.html, puedes dejarla vacía.
+ * Si abres este HTML fuera de Apps Script, pega aquí la URL de implementación terminada en /exec.
  * Ejemplo:
  * const API_URL = 'https://script.google.com/macros/s/AKfycbx.../exec';
  */
-const API_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT_EXEC';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx0DiCt7v9yUoipLufYDTHycjjaLCYu1OotEIpYPZTOyMAXTFeB7FGEtbkbQxhVArjB/exec';
 
 const DEMO_PRODUCTS = [{"id": "PROD001", "fragancia": "1 MILLION RABANNE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD002", "fragancia": "212 CAOLINA HERRERA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD003", "fragancia": "212 CAROLINA HERRERA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD004", "fragancia": "212 VIP CAROLINA HERRERA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD005", "fragancia": "212 VIP ROSE CAROLINA HERRERA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD006", "fragancia": "360 PERRI ELLIS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD007", "fragancia": "360 PERRY ELLIS M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD008", "fragancia": "9 (NUEVE) PM AFNAN M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD009", "fragancia": "9PM REVEL U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD010", "fragancia": "AL NOBLE SAFFER U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD011", "fragancia": "AMATISTA U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD012", "fragancia": "AMBER OUD U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD013", "fragancia": "AMOR AMOR CHACHAREL F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD014", "fragancia": "ANGARA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD015", "fragancia": "ARABIAN TONKA U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD016", "fragancia": "ASAD LATTAFA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD017", "fragancia": "BADE AL OUD SUBLIME U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD018", "fragancia": "BAHARA ROUS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD019", "fragancia": "BFF KIM KARDASHIAN F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD020", "fragancia": "BLACK XS M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD021", "fragancia": "CANCAN PARIS HILTON F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD022", "fragancia": "CAROLINA HERRERA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD023", "fragancia": "CK ONE CALVIN KLEIN U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD024", "fragancia": "CLOUD ARIANA GRANDE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD025", "fragancia": "CLOUD PINK F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD026", "fragancia": "CLUB DE NIUT F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD027", "fragancia": "CLUB DE NUIT M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD028", "fragancia": "COCO MADEMOISLE CHANEL F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD029", "fragancia": "COCONUT F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD030", "fragancia": "COLORANTES F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD031", "fragancia": "CUPCAKE ROJO FEM F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD032", "fragancia": "DIESEL BLANCA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD033", "fragancia": "FANTASTY F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD034", "fragancia": "FEROMONAS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD035", "fragancia": "GAIA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD036", "fragancia": "GOD OF FIRE U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD037", "fragancia": "GOOD GIRL F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD038", "fragancia": "HAYA LATTAFA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD039", "fragancia": "HUGO BOSS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD040", "fragancia": "HUGO BOSS M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD041", "fragancia": "IL KAKUNO ILMIN U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD042", "fragancia": "IL ROSSO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD043", "fragancia": "INTENSE CAFÉ U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD044", "fragancia": "INVICTUS RABANNE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD045", "fragancia": "INVICTUS VICTORY ELIXIR RABANNE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD046", "fragancia": "JEAN PAUL M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD047", "fragancia": "KHAMRAH LATTAFA U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD048", "fragancia": "KING BHARARA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD049", "fragancia": "LA VIDA ES BELLA LANCOME F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD050", "fragancia": "LACOSTE RED M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD051", "fragancia": "LACOSTE WHITE L 12.12 M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD052", "fragancia": "LIGHT BLUE DOLCE GABBANA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD053", "fragancia": "LOCO LOEWE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD054", "fragancia": "MILLON LUKY M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD055", "fragancia": "MISS DIOR F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD056", "fragancia": "NITRO ELIXIR M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD057", "fragancia": "NITRO RED M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD058", "fragancia": "ODYSSEY MANDARIN SKY M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD059", "fragancia": "OMBRE NOMADE LOUIS VUITTONILMIN U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD060", "fragancia": "OMNIA CRISTALINE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD061", "fragancia": "PARADOXE F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD062", "fragancia": "PARIS HILTON F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD063", "fragancia": "PASSPORT F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD064", "fragancia": "PERFUMEROS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD065", "fragancia": "RALPH F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD066", "fragancia": "SANTAL 33 U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD067", "fragancia": "SCADA SORBETO ROSSO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD068", "fragancia": "SCANDALOUS F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD069", "fragancia": "SILVER MONTAIN WATER CREED U", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD070", "fragancia": "SOLO LOEWE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD071", "fragancia": "TOMMY GIRL HILFIGER F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD072", "fragancia": "TOMMY TOMMY HILFIGER M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD073", "fragancia": "TOY 2 MOCHINO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD074", "fragancia": "TOY BOY MOCHINO M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD075", "fragancia": "ULTRAMALE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD076", "fragancia": "VAINILLA FREAK F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD077", "fragancia": "VALENTINO F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD078", "fragancia": "VALENTINO M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD079", "fragancia": "VALENTINO UOMO BORIN ROMA M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD080", "fragancia": "VERSACE M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD081", "fragancia": "WASICE MEN M", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD082", "fragancia": "YARA LATTAFA F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD083", "fragancia": "YARA CANDY F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}, {"id": "PROD084", "fragancia": "YUM YUM F", "unidadGr": 1, "valorGramo": 1500, "iva": 0.19}];
 const DEMO_MOVEMENTS = [{"id": "MOV0001", "fecha": "2026-05-13", "productoId": "PROD035", "fragancia": "GAIA F", "tipoMovimiento": "COMPRA", "cantidadGr": 1, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0002", "fecha": "2026-05-13", "productoId": "PROD005", "fragancia": "212 VIP ROSE CAROLINA HERRERA F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0003", "fecha": "2026-05-13", "productoId": "PROD068", "fragancia": "SCANDALOUS F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0004", "fecha": "2026-05-13", "productoId": "PROD065", "fragancia": "RALPH F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0005", "fecha": "2026-05-13", "productoId": "PROD071", "fragancia": "TOMMY GIRL HILFIGER F", "tipoMovimiento": "COMPRA", "cantidadGr": 125, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0006", "fecha": "2026-05-13", "productoId": "PROD021", "fragancia": "CANCAN PARIS HILTON F", "tipoMovimiento": "COMPRA", "cantidadGr": 5, "valorGramo": 1500, "observaciones": "Importado desde Excel"}, {"id": "MOV0007", "fecha": "2026-05-13", "productoId": "PROD003", "fragancia": "212 CAROLINA HERRERA M", "tipoMovimiento": "COMPRA", "cantidadGr": 6, "valorGramo": 1500, "observaciones": "Importado desde Excel"}];
+
+const DEFAULT_PERSONALIZACION = {
+  appName: 'Inventario de Perfumes', logoEmoji: '⚗️', themeMode: 'light',
+  primaryColor: '#0f766e', primaryDarkColor: '#115e59', secondaryColor: '#14b8a6',
+  backgroundColor: '#f6f8fb', cardColor: '#ffffff', textColor: '#172033', mutedTextColor: '#64748b', borderColor: '#e2e8f0',
+  accentColor: '#d97706', dangerColor: '#dc2626', okColor: '#16a34a',
+  darkBackgroundColor: '#0f172a', darkCardColor: '#111827', darkTextColor: '#e5e7eb', darkMutedTextColor: '#94a3b8', darkBorderColor: '#334155',
+  radiusPx: '18', locale: 'es-CO', currencyCode: 'COP'
+};
 
 const state = {
   products: [],
   movements: [],
   migraciones: [],
+  historial: [],
   dashboard: {},
+  personalizacion: { ...DEFAULT_PERSONALIZACION },
   lastReport: null,
-  demo: API_URL.includes('PEGA_AQUI')
+  demo: false
 };
 
-const fmtMoney = n => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(n || 0));
-const fmtNum = n => new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(Number(n || 0));
+let movementProductMatches = [];
+let movementProductActiveIndex = -1;
+
+function hasGoogleScriptRun() {
+  return typeof google !== 'undefined' && google.script && google.script.run;
+}
+
+function refreshDemoMode() {
+  state.demo = !hasGoogleScriptRun() && (!API_URL || API_URL.includes('PEGA_AQUI'));
+  return state.demo;
+}
+
+function fmtMoney(n) {
+  const p = state.personalizacion || DEFAULT_PERSONALIZACION;
+  return new Intl.NumberFormat(p.locale || 'es-CO', { style: 'currency', currency: p.currencyCode || 'COP', maximumFractionDigits: 0 }).format(Number(n || 0));
+}
+function fmtNum(n) {
+  const p = state.personalizacion || DEFAULT_PERSONALIZACION;
+  return new Intl.NumberFormat(p.locale || 'es-CO', { maximumFractionDigits: 2 }).format(Number(n || 0));
+}
 const today = () => new Date().toISOString().slice(0,10);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -417,7 +853,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('movementFecha').value = today();
   document.getElementById('buscarProducto').addEventListener('input', renderProducts);
   document.getElementById('filtroTipoProducto').addEventListener('change', renderProducts);
-  document.getElementById('movementProducto').addEventListener('change', fillMovementPrice);
+  setupMovementProductAutocomplete();
+  ['settingThemeMode','settingPrimaryColor','settingPrimaryDarkColor','settingSecondaryColor','settingBackgroundColor','settingCardColor','settingTextColor','settingBorderColor','settingDarkBackgroundColor','settingDarkCardColor','settingDarkTextColor','settingDarkBorderColor','settingAccentColor','settingAppName','settingLogoEmoji','settingCurrencyCode','settingLocale','settingRadiusPx'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', previewPersonalizacionFromForm);
+  });
+  applyTheme(state.personalizacion);
   loadAll();
 });
 
@@ -448,18 +889,36 @@ function fillMonthSelects() {
   document.getElementById('migAnio').value = new Date().getFullYear();
 }
 
+
+async function checkConnection(button) {
+  try {
+    const res = await withButtonLoading(button, 'Comprobando...', () => api('ping', {}));
+    const name = res.spreadsheetName ? ` · Hoja: ${res.spreadsheetName}` : '';
+    toast((res.message || 'Conexión correcta') + name, 'ok');
+    setStatus('Conectado a Google Sheets', 'ok');
+  } catch (err) {
+    toast('No se pudo comprobar la conexión: ' + err.message, 'error');
+    setStatus('Error de conexión', 'warn');
+  }
+}
+
 async function loadAll() {
+  refreshDemoMode();
   setStatus('Cargando...', 'warn');
   try {
     const res = await api('getInitialData', { limit: 500 });
     state.products = res.productos || [];
     state.movements = res.movimientos || [];
     state.migraciones = res.migraciones || [];
+    state.historial = res.historial || [];
     state.dashboard = res.dashboard || computeDemoDashboard();
+    state.personalizacion = { ...DEFAULT_PERSONALIZACION, ...(res.personalizacion || getLocalPersonalizacion()) };
+    applyTheme(state.personalizacion);
+    renderPersonalizacionForm();
     renderAll();
     setStatus(state.demo ? 'Vista local de prueba' : 'Conectado a Google Sheets', state.demo ? 'warn' : 'ok');
   } catch (err) {
-    toast('Error al cargar: ' + err.message);
+    toast('Error al cargar: ' + err.message, 'error');
     setStatus('Error de conexión', 'warn');
   }
 }
@@ -487,6 +946,7 @@ function renderAll() {
   renderMovements();
   renderDashboard();
   renderMigraciones();
+  renderHistorial();
   fillProductSelect();
 }
 
@@ -582,6 +1042,7 @@ async function generateReport() {
   body.innerHTML = det.length ? det.map(m => `
     <tr><td>${escapeHtml(m.Fecha)}</td><td>${escapeHtml(m.Fragancia)}</td><td>${escapeHtml(m.TipoMovimiento)}</td><td class="right">${fmtNum(m.CantidadGr)}</td><td class="right">${fmtMoney(m.ValorInicial)}</td><td class="right">${fmtMoney(m.IVA)}</td><td class="right">${fmtMoney(m.Total)}</td></tr>
   `).join('') : '<tr><td colspan="7" class="empty">Sin datos para los filtros seleccionados.</td></tr>';
+  return res;
 }
 
 function renderGroup(id, rows) {
@@ -603,6 +1064,157 @@ function renderMigraciones() {
       <td class="right">${fmtMoney(m.TotalConIVA || 0)}</td>
     </tr>
   `).join('') : '<tr><td colspan="6" class="empty">Aún no hay migraciones.</td></tr>';
+}
+
+
+function renderHistorial() {
+  const body = document.getElementById('historialBody');
+  if (!body) return;
+  const rows = state.historial || [];
+  body.innerHTML = rows.length ? rows.map(h => {
+    const accion = String(h.Accion || '').toUpperCase();
+    const canRestore = ['AGREGAR','EDITAR','ELIMINAR'].includes(accion) && String(h.Restaurado || 'NO') !== 'SI';
+    return `
+      <tr>
+        <td><b>${escapeHtml(h.ID)}</b></td>
+        <td>${escapeHtml(h.FechaHora || h.Fecha || '')}<div class="history-muted">${escapeHtml(h.Usuario || '')}</div></td>
+        <td>${historyPill(accion)}</td>
+        <td>${escapeHtml(h.Modulo || '')}</td>
+        <td><b>${escapeHtml(h.RegistroID || '')}</b></td>
+        <td>${escapeHtml(short(h.Descripcion || '', 55))}</td>
+        <td>${String(h.Restaurado || 'NO') === 'SI' ? '<span class="pill in">SI</span>' : '<span class="pill neutral">NO</span>'}</td>
+        <td><div class="actions">
+          <button class="btn-sm btn-ghost" onclick="viewHistorial('${escapeHtml(h.ID)}')">Ver</button>
+          ${canRestore ? `<button class="btn-sm btn-warning" onclick="restoreHistorial('${escapeHtml(h.ID)}')">Restaurar</button>` : ''}
+        </div></td>
+      </tr>
+    `;
+  }).join('') : '<tr><td colspan="8" class="empty">No hay historial para los filtros seleccionados.</td></tr>';
+}
+
+function historyPill(accion) {
+  const a = String(accion || '').toUpperCase();
+  if (a === 'AGREGAR') return '<span class="pill in">AGREGAR</span>';
+  if (a === 'EDITAR') return '<span class="pill neutral">EDITAR</span>';
+  if (a === 'ELIMINAR') return '<span class="pill out">ELIMINAR</span>';
+  if (a === 'RESTAURAR') return '<span class="pill u">RESTAURAR</span>';
+  return `<span class="pill neutral">${escapeHtml(a || 'N/A')}</span>`;
+}
+
+
+function renderPersonalizacionForm() {
+  const p = { ...DEFAULT_PERSONALIZACION, ...(state.personalizacion || {}) };
+  const map = {
+    settingAppName: 'appName', settingLogoEmoji: 'logoEmoji', settingThemeMode: 'themeMode', settingCurrencyCode: 'currencyCode', settingLocale: 'locale', settingRadiusPx: 'radiusPx',
+    settingPrimaryColor: 'primaryColor', settingPrimaryDarkColor: 'primaryDarkColor', settingSecondaryColor: 'secondaryColor', settingBackgroundColor: 'backgroundColor', settingCardColor: 'cardColor', settingTextColor: 'textColor', settingBorderColor: 'borderColor',
+    settingDarkBackgroundColor: 'darkBackgroundColor', settingDarkCardColor: 'darkCardColor', settingDarkTextColor: 'darkTextColor', settingDarkBorderColor: 'darkBorderColor', settingAccentColor: 'accentColor'
+  };
+  Object.entries(map).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = p[key] ?? DEFAULT_PERSONALIZACION[key];
+  });
+  previewPersonalizacionFromForm();
+}
+
+function collectPersonalizacionForm() {
+  const value = id => document.getElementById(id)?.value || '';
+  return {
+    appName: value('settingAppName'),
+    logoEmoji: value('settingLogoEmoji'),
+    themeMode: value('settingThemeMode'),
+    currencyCode: value('settingCurrencyCode') || 'COP',
+    locale: value('settingLocale') || 'es-CO',
+    radiusPx: value('settingRadiusPx') || '18',
+    primaryColor: value('settingPrimaryColor'),
+    primaryDarkColor: value('settingPrimaryDarkColor'),
+    secondaryColor: value('settingSecondaryColor'),
+    backgroundColor: value('settingBackgroundColor'),
+    cardColor: value('settingCardColor'),
+    textColor: value('settingTextColor'),
+    borderColor: value('settingBorderColor'),
+    accentColor: value('settingAccentColor'),
+    darkBackgroundColor: value('settingDarkBackgroundColor'),
+    darkCardColor: value('settingDarkCardColor'),
+    darkTextColor: value('settingDarkTextColor'),
+    darkBorderColor: value('settingDarkBorderColor')
+  };
+}
+
+function previewPersonalizacionFromForm() {
+  const p = { ...DEFAULT_PERSONALIZACION, ...collectPersonalizacionForm() };
+  applyTheme(p, true);
+}
+
+function applyTheme(settings, previewOnly = false) {
+  const p = { ...DEFAULT_PERSONALIZACION, ...(settings || {}) };
+  const mode = p.themeMode === 'dark' ? 'dark' : 'light';
+  const root = document.documentElement;
+  const bg = mode === 'dark' ? p.darkBackgroundColor : p.backgroundColor;
+  const card = mode === 'dark' ? p.darkCardColor : p.cardColor;
+  const ink = mode === 'dark' ? p.darkTextColor : p.textColor;
+  const muted = mode === 'dark' ? p.darkMutedTextColor : p.mutedTextColor;
+  const line = mode === 'dark' ? p.darkBorderColor : p.borderColor;
+  root.style.setProperty('--bg', bg);
+  root.style.setProperty('--card', card);
+  root.style.setProperty('--ink', ink);
+  root.style.setProperty('--muted', muted);
+  root.style.setProperty('--line', line);
+  root.style.setProperty('--primary', p.primaryColor);
+  root.style.setProperty('--primary-dark', p.primaryDarkColor);
+  root.style.setProperty('--danger', p.dangerColor);
+  root.style.setProperty('--warning', p.accentColor);
+  root.style.setProperty('--ok', p.okColor);
+  root.style.setProperty('--radius', `${Number(p.radiusPx || 18)}px`);
+  document.body.dataset.theme = mode;
+  document.body.style.background = bg;
+  const logo = document.querySelector('.logo');
+  if (logo) {
+    logo.textContent = p.logoEmoji || '⚗️';
+    logo.style.background = `linear-gradient(135deg, ${p.primaryColor}, ${p.secondaryColor})`;
+  }
+  const title = document.querySelector('h1');
+  if (title) title.textContent = p.appName || 'Inventario de Perfumes';
+  const previewTitle = document.getElementById('themePreviewTitle');
+  if (previewTitle) previewTitle.textContent = `${p.logoEmoji || '⚗️'} ${p.appName || 'Inventario de Perfumes'}`;
+  if (!previewOnly) state.personalizacion = p;
+}
+
+async function savePersonalizacion() {
+  const settings = { ...DEFAULT_PERSONALIZACION, ...collectPersonalizacionForm() };
+  try {
+    const res = await withButtonLoading(event?.currentTarget, 'Guardando...', () => api('saveSettings', { settings }));
+    state.personalizacion = { ...DEFAULT_PERSONALIZACION, ...(res.personalizacion || settings) };
+    applyTheme(state.personalizacion);
+    renderPersonalizacionForm();
+    renderAll();
+    toast(res.message || 'Personalización guardada correctamente.', 'ok');
+  } catch (err) {
+    toast('No se pudo guardar la personalización: ' + err.message, 'error');
+  }
+}
+
+async function resetPersonalizacion() {
+  const res = await api('resetSettings', {});
+  state.personalizacion = { ...DEFAULT_PERSONALIZACION, ...(res.personalizacion || {}) };
+  applyTheme(state.personalizacion);
+  renderPersonalizacionForm();
+  renderAll();
+  toast(res.message || 'Tema restaurado');
+}
+
+async function toggleThemeMode() {
+  const el = document.getElementById('settingThemeMode');
+  el.value = el.value === 'dark' ? 'light' : 'dark';
+  await savePersonalizacion();
+}
+
+function getLocalPersonalizacion() {
+  try { return JSON.parse(localStorage.getItem('perfumeInventoryTheme') || '{}'); }
+  catch (e) { return {}; }
+}
+
+function saveLocalPersonalizacion(settings) {
+  localStorage.setItem('perfumeInventoryTheme', JSON.stringify(settings || DEFAULT_PERSONALIZACION));
 }
 
 function openProductModal(p = null) {
@@ -635,18 +1247,26 @@ async function saveProduct() {
     estado: val('productEstado'),
     observaciones: val('productObs')
   };
-  if (!payload.fragancia) return toast('Ingrese el nombre del perfume.');
-  const res = await api('saveProduct', payload);
-  toast(res.message || 'Guardado');
-  closeModal('productModal');
-  await loadAll();
+  if (!payload.fragancia) return toast('Ingrese el nombre del perfume.', 'warn');
+  try {
+    const res = await withButtonLoading('productSaveBtn', 'Guardando...', () => api('saveProduct', payload));
+    toast(res.message || 'Registro guardado correctamente.', 'ok');
+    closeModal('productModal');
+    await loadAll();
+  } catch (err) {
+    toast('No se pudo guardar el perfume: ' + err.message, 'error');
+  }
 }
 
 async function deleteProduct(id) {
   if (!confirm('¿Eliminar este perfume?')) return;
-  const res = await api('deleteProduct', { id });
-  toast(res.message || 'Eliminado');
-  await loadAll();
+  try {
+    const res = await api('deleteProduct', { id });
+    toast(res.message || 'Producto eliminado correctamente.', 'ok');
+    await loadAll();
+  } catch (err) {
+    toast('No se pudo eliminar el perfume: ' + err.message, 'error');
+  }
 }
 
 function openMovementModal(m = null) {
@@ -655,22 +1275,210 @@ function openMovementModal(m = null) {
   setVal('movementId', m?.ID || '');
   setVal('movementFecha', m?.Fecha || today());
   setVal('movementTipo', m?.TipoMovimiento || 'COMPRA');
-  setVal('movementProducto', m?.ProductoID || state.products[0]?.ID || '');
   setVal('movementCantidad', m?.CantidadGr || '');
   setVal('movementValor', m?.ValorGramo || '');
   setVal('movementUsuario', m?.Usuario || '');
   setVal('movementObs', m?.Observaciones || '');
+  setMovementProductValue(m?.ProductoID || state.products[0]?.ID || '', false);
   fillMovementPrice();
   showModal('movementModal');
+  setTimeout(() => document.getElementById('movementProductoSearch')?.focus(), 120);
 }
 
 function fillProductSelect() {
-  const sel = document.getElementById('movementProducto');
-  const current = sel.value;
-  sel.innerHTML = state.products
-    .filter(p => (p.Estado || 'ACTIVO') === 'ACTIVO')
-    .map(p => `<option value="${escapeHtml(p.ID)}">${escapeHtml(p.ID)} - ${escapeHtml(p.Fragancia)}</option>`).join('');
-  if (current) sel.value = current;
+  const current = val('movementProducto');
+  if (current && getActiveMovementProducts().some(p => String(p.ID) === String(current))) {
+    setMovementProductValue(current, false);
+  } else {
+    setVal('movementProducto', '');
+    setVal('movementProductoSearch', '');
+    updateMovementProductHint();
+  }
+  renderMovementProductResults('', false);
+}
+
+function setupMovementProductAutocomplete() {
+  const input = document.getElementById('movementProductoSearch');
+  const combo = document.getElementById('movementProductoCombo');
+  if (!input || !combo) return;
+
+  input.addEventListener('input', () => {
+    const exact = findMovementProductExact(input.value);
+    setVal('movementProducto', exact ? exact.ID : '');
+    renderMovementProductResults(input.value, true);
+    updateMovementProductHint();
+    if (exact) fillMovementPrice();
+  });
+
+  input.addEventListener('focus', () => renderMovementProductResults(input.value, true));
+  input.addEventListener('keydown', handleMovementProductKeydown);
+
+  document.addEventListener('click', e => {
+    if (!combo.contains(e.target)) closeMovementProductResults();
+  });
+}
+
+function getActiveMovementProducts() {
+  return state.products.filter(p => (p.Estado || 'ACTIVO') === 'ACTIVO');
+}
+
+function normalizeSearchText(text) {
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+function movementProductLabel(p) {
+  return `${p.ID} - ${p.Fragancia}`;
+}
+
+function setMovementProductValue(productId, updatePrice = true) {
+  const p = state.products.find(x => String(x.ID) === String(productId));
+  if (!p) {
+    setVal('movementProducto', '');
+    setVal('movementProductoSearch', '');
+    updateMovementProductHint();
+    return;
+  }
+  setVal('movementProducto', p.ID);
+  setVal('movementProductoSearch', movementProductLabel(p));
+  updateMovementProductHint(p);
+  closeMovementProductResults();
+  if (updatePrice) fillMovementPrice();
+}
+
+function findMovementProductExact(text) {
+  const q = normalizeSearchText(text);
+  if (!q) return null;
+  return getActiveMovementProducts().find(p => {
+    const id = normalizeSearchText(p.ID);
+    const label = normalizeSearchText(movementProductLabel(p));
+    return q === id || q === label;
+  }) || null;
+}
+
+function getMovementProductMatches(query) {
+  const q = normalizeSearchText(query);
+  let items = getActiveMovementProducts();
+  if (q) {
+    items = items.filter(p => {
+      const id = normalizeSearchText(p.ID);
+      const fragancia = normalizeSearchText(p.Fragancia);
+      const label = normalizeSearchText(movementProductLabel(p));
+      return id.includes(q) || fragancia.includes(q) || label.includes(q);
+    });
+  }
+  return items.slice(0, 80);
+}
+
+function renderMovementProductResults(query = '', open = true) {
+  const box = document.getElementById('movementProductoResults');
+  if (!box) return;
+  const items = getMovementProductMatches(query);
+  movementProductMatches = items;
+  movementProductActiveIndex = -1;
+  box.innerHTML = '';
+
+  if (!items.length) {
+    const empty = document.createElement('div');
+    empty.className = 'combo-empty';
+    empty.textContent = query ? 'No se encontró ningún perfume con esa búsqueda.' : 'No hay perfumes activos para seleccionar.';
+    box.appendChild(empty);
+  } else {
+    items.forEach((p, index) => {
+      const item = document.createElement('div');
+      item.className = 'combo-option';
+      item.dataset.index = String(index);
+      item.innerHTML = `<b>${escapeHtml(p.Fragancia)}</b><small>${escapeHtml(p.ID)} · Tipo ${escapeHtml(p.Tipo || 'N/A')} · Stock ${fmtNum(p.StockGr || 0)} gr</small>`;
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        setMovementProductValue(p.ID, true);
+      });
+      box.appendChild(item);
+    });
+  }
+
+  box.classList.toggle('show', Boolean(open));
+}
+
+function closeMovementProductResults() {
+  const box = document.getElementById('movementProductoResults');
+  if (box) box.classList.remove('show');
+}
+
+function handleMovementProductKeydown(e) {
+  const box = document.getElementById('movementProductoResults');
+  if (!box || !box.classList.contains('show')) {
+    if (e.key === 'ArrowDown') renderMovementProductResults(val('movementProductoSearch'), true);
+    return;
+  }
+
+  const options = Array.from(box.querySelectorAll('.combo-option'));
+  if (!options.length) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    movementProductActiveIndex = (movementProductActiveIndex + 1) % options.length;
+    updateMovementProductActiveOption(options);
+  }
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    movementProductActiveIndex = (movementProductActiveIndex - 1 + options.length) % options.length;
+    updateMovementProductActiveOption(options);
+  }
+
+  if (e.key === 'Enter') {
+    if (movementProductActiveIndex >= 0 && movementProductMatches[movementProductActiveIndex]) {
+      e.preventDefault();
+      setMovementProductValue(movementProductMatches[movementProductActiveIndex].ID, true);
+    }
+  }
+
+  if (e.key === 'Escape') closeMovementProductResults();
+}
+
+function updateMovementProductActiveOption(options) {
+  options.forEach((opt, i) => opt.classList.toggle('active', i === movementProductActiveIndex));
+  options[movementProductActiveIndex]?.scrollIntoView({ block: 'nearest' });
+}
+
+function updateMovementProductHint(product = null) {
+  const hint = document.getElementById('movementProductoHint');
+  if (!hint) return;
+  if (product) {
+    hint.textContent = `Seleccionado: ${product.ID} - ${product.Fragancia}`;
+    return;
+  }
+  const selectedId = val('movementProducto');
+  const selected = state.products.find(p => String(p.ID) === String(selectedId));
+  hint.textContent = selected
+    ? `Seleccionado: ${selected.ID} - ${selected.Fragancia}`
+    : 'Escribe para buscar y selecciona un perfume de la lista.';
+}
+
+function resolveMovementProductSearch() {
+  const selectedId = val('movementProducto');
+  if (selectedId && state.products.some(p => String(p.ID) === String(selectedId))) return true;
+
+  const typed = val('movementProductoSearch');
+  const exact = findMovementProductExact(typed);
+  if (exact) {
+    setMovementProductValue(exact.ID, true);
+    return true;
+  }
+
+  const matches = getMovementProductMatches(typed);
+  if (matches.length === 1) {
+    setMovementProductValue(matches[0].ID, true);
+    return true;
+  }
+
+  updateMovementProductHint();
+  renderMovementProductResults(typed, true);
+  return false;
 }
 
 function fillMovementPrice() {
@@ -680,6 +1488,7 @@ function fillMovementPrice() {
 }
 
 async function saveMovement() {
+  if (!resolveMovementProductSearch()) return toast('Seleccione un perfume válido desde la lista.', 'warn');
   const payload = {
     id: val('movementId'),
     fecha: val('movementFecha'),
@@ -690,18 +1499,26 @@ async function saveMovement() {
     usuario: val('movementUsuario'),
     observaciones: val('movementObs')
   };
-  if (!payload.fecha || !payload.productoId || !payload.cantidadGr) return toast('Complete fecha, perfume y cantidad.');
-  const res = await api('saveMovement', payload);
-  toast(res.message || 'Movimiento guardado');
-  closeModal('movementModal');
-  await loadAll();
+  if (!payload.fecha || !payload.productoId || !payload.cantidadGr) return toast('Complete fecha, perfume y cantidad.', 'warn');
+  try {
+    const res = await withButtonLoading('movementSaveBtn', 'Guardando...', () => api('saveMovement', payload));
+    toast(res.message || 'Movimiento guardado correctamente.', 'ok');
+    closeModal('movementModal');
+    await loadAll();
+  } catch (err) {
+    toast('No se pudo guardar el movimiento: ' + err.message, 'error');
+  }
 }
 
 async function deleteMovement(id) {
   if (!confirm('¿Eliminar este movimiento? Se reversará el stock.')) return;
-  const res = await api('deleteMovement', { id });
-  toast(res.message || 'Movimiento eliminado');
-  await loadAll();
+  try {
+    const res = await api('deleteMovement', { id });
+    toast(res.message || 'Movimiento eliminado correctamente.', 'ok');
+    await loadAll();
+  } catch (err) {
+    toast('No se pudo eliminar el movimiento: ' + err.message, 'error');
+  }
 }
 
 async function runMigration() {
@@ -715,9 +1532,311 @@ async function runMigration() {
     tipoProducto: val('migTipoProducto'),
     modo: val('migMes') && val('migAnio') ? 'MES' : 'RANGO'
   };
-  const res = await api('migrarMovimientos', payload);
-  toast(res.message || 'Migración ejecutada');
-  await loadAll();
+  try {
+    const res = await withButtonLoading('migrationRunBtn', 'Migrando...', () => api('migrarMovimientos', payload));
+    toast(res.message || 'Migración ejecutada correctamente.', 'ok');
+    await loadAll();
+  } catch (err) {
+    toast('No se pudo ejecutar la migración: ' + err.message, 'error');
+  }
+}
+
+
+async function loadHistorial() {
+  const payload = {
+    desde: val('histDesde'),
+    hasta: val('histHasta'),
+    accion: val('histAccion'),
+    modulo: val('histModulo'),
+    buscar: val('histBuscar'),
+    limit: 500
+  };
+  try {
+    const res = await api('listHistorial', payload);
+    state.historial = res.historial || [];
+    renderHistorial();
+    toast('Historial actualizado correctamente.', 'ok');
+  } catch (err) {
+    toast('No se pudo cargar el historial: ' + err.message, 'error');
+  }
+}
+
+function clearHistorialFilters() {
+  setVal('histDesde', '');
+  setVal('histHasta', '');
+  setVal('histAccion', '');
+  setVal('histModulo', '');
+  setVal('histBuscar', '');
+  loadHistorial();
+}
+
+function viewHistorial(id) {
+  const h = (state.historial || []).find(x => String(x.ID) === String(id));
+  if (!h) return toast('Registro de historial no encontrado.', 'warn');
+  const detail = {
+    ID: h.ID,
+    FechaHora: h.FechaHora,
+    Usuario: h.Usuario,
+    Accion: h.Accion,
+    Modulo: h.Modulo,
+    RegistroID: h.RegistroID,
+    Descripcion: h.Descripcion,
+    Restaurado: h.Restaurado,
+    FechaRestauracion: h.FechaRestauracion || '',
+    Antes: parseHistoryJsonClient(h.AntesJSON),
+    Despues: parseHistoryJsonClient(h.DespuesJSON)
+  };
+  document.getElementById('historyDetailContent').textContent = JSON.stringify(detail, null, 2);
+  showModal('historyDetailModal');
+}
+
+async function restoreHistorial(id) {
+  if (!confirm('¿Restaurar este cambio? El sistema actualizará la base de datos y ajustará stock si corresponde.')) return;
+  try {
+    const res = await api('restoreHistorial', { id, usuario: 'Aplicativo' });
+    toast(res.message || 'Historial restaurado correctamente.', 'ok');
+    state.historial = res.historial || state.historial;
+    await loadAll();
+  } catch (err) {
+    toast('No se pudo restaurar el historial: ' + err.message, 'error');
+  }
+}
+
+function parseHistoryJsonClient(value) {
+  if (value === '' || value === null || typeof value === 'undefined') return null;
+  try { return JSON.parse(String(value)); }
+  catch (e) { return String(value); }
+}
+
+
+
+async function downloadReportExcel(button) {
+  await withButtonLoading(button, 'Generando Excel...', async () => {
+    try {
+      await generateReport();
+      if (!state.lastReport) return toast('Primero genere un informe.', 'warn');
+
+      const report = state.lastReport || {};
+      const filters = getReportExcelFilters();
+      const totals = computeReportExcelTotals(report);
+      const html = buildReportExcelHtml(report, filters, totals);
+      const blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '');
+      a.href = URL.createObjectURL(blob);
+      a.download = `informe_inventario_perfumes_${stamp}.xls`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(a.href);
+        a.remove();
+      }, 250);
+      toast('Informe Excel generado correctamente con tablas informativas y totales detallados.', 'ok');
+    } catch (err) {
+      toast('No se pudo generar el Excel: ' + err.message, 'error');
+    }
+  });
+}
+
+function getReportExcelFilters() {
+  return [
+    ['Desde', val('repDesde') || 'Todos'],
+    ['Hasta', val('repHasta') || 'Todos'],
+    ['Mes', val('repMes') ? monthNameFromNumber(val('repMes')) : 'Todos'],
+    ['Año', val('repAnio') || 'Todos'],
+    ['Tipo de movimiento', val('repTipoMov') || 'Todos'],
+    ['Tipo de perfume', val('repTipoProducto') || 'Todos']
+  ];
+}
+
+function computeReportExcelTotals(report) {
+  const rows = report.movimientos || [];
+  const resumen = report.resumen || {};
+  const entradas = ['COMPRA','ENTRADA','AJUSTE_ENTRADA','DEVOLUCION'];
+  const salidas = ['VENTA','SALIDA','AJUSTE_SALIDA','MERMA'];
+  let entradasGr = 0;
+  let salidasGr = 0;
+  let entradasValor = 0;
+  let salidasValor = 0;
+
+  rows.forEach(m => {
+    const tipo = String(m.TipoMovimiento || '').toUpperCase();
+    const gramos = Number(m.CantidadGr || 0);
+    const total = Number(m.Total || 0);
+    if (entradas.includes(tipo)) {
+      entradasGr += gramos;
+      entradasValor += total;
+    }
+    if (salidas.includes(tipo)) {
+      salidasGr += gramos;
+      salidasValor += total;
+    }
+  });
+
+  return {
+    registros: Number(resumen.registros || rows.length || 0),
+    totalGramos: Number(resumen.totalGramos || sumReportField(rows, 'CantidadGr')),
+    totalNeto: Number(resumen.totalNeto || sumReportField(rows, 'ValorInicial')),
+    totalIVA: Number(resumen.totalIVA || sumReportField(rows, 'IVA')),
+    totalConIVA: Number(resumen.totalConIVA || sumReportField(rows, 'Total')),
+    entradasGr,
+    salidasGr,
+    saldoGr: entradasGr - salidasGr,
+    entradasValor,
+    salidasValor,
+    saldoValor: entradasValor - salidasValor
+  };
+}
+
+function sumReportField(rows, field) {
+  return (rows || []).reduce((sum, row) => sum + Number(row[field] || 0), 0);
+}
+
+function buildReportExcelHtml(report, filters, totals) {
+  const rows = report.movimientos || [];
+  const porProducto = report.porProducto || [];
+  const porMes = report.porMes || [];
+  const porTipoMovimiento = report.porTipoMovimiento || [];
+  const porTipoProducto = report.porTipoProducto || [];
+  const p = state.personalizacion || DEFAULT_PERSONALIZACION;
+  const appName = p.appName || 'Inventario de Perfumes';
+  const generatedAt = new Date().toLocaleString(p.locale || 'es-CO');
+
+  const style = [
+    '<meta charset="utf-8">',
+    '<style>',
+    'body{font-family:Arial,sans-serif;color:#172033}',
+    'h1{color:#0f766e;font-size:22px;margin:0 0 4px}',
+    'h2{color:#115e59;font-size:16px;margin:22px 0 8px}',
+    '.meta{color:#64748b;font-size:12px}',
+    'table{border-collapse:collapse;margin-bottom:16px}',
+    'th{background:#0f766e;color:#ffffff;font-weight:bold;border:1px solid #0f766e;padding:8px}',
+    'td{border:1px solid #cbd5e1;padding:7px;vertical-align:top}',
+    '.label{background:#f1f5f9;font-weight:bold}',
+    '.num{mso-number-format:"#,##0.00";text-align:right}',
+    '.money{mso-number-format:"$#,##0.00";text-align:right}',
+    '.total{background:#ecfdf5;font-weight:bold}',
+    '</style>'
+  ].join('');
+
+  const htmlParts = [];
+  htmlParts.push(style);
+  htmlParts.push(`<h1>${xl(appName)} - Informe de inventario</h1>`);
+  htmlParts.push(`<div class="meta">Generado: ${xl(generatedAt)}</div>`);
+
+  htmlParts.push('<h2>Filtros aplicados</h2>');
+  htmlParts.push('<table>');
+  filters.forEach(f => htmlParts.push(`<tr><td class="label">${xl(f[0])}</td><td>${xl(f[1])}</td></tr>`));
+  htmlParts.push('</table>');
+
+  htmlParts.push('<h2>Resumen general y totales detallados</h2>');
+  htmlParts.push('<table>');
+  addMetricRow(htmlParts, 'Registros', totals.registros, 'num');
+  addMetricRow(htmlParts, 'Total gramos', totals.totalGramos, 'num');
+  addMetricRow(htmlParts, 'Total neto', totals.totalNeto, 'money');
+  addMetricRow(htmlParts, 'Total IVA', totals.totalIVA, 'money');
+  addMetricRow(htmlParts, 'Total con IVA', totals.totalConIVA, 'money total');
+  addMetricRow(htmlParts, 'Entradas en gramos', totals.entradasGr, 'num');
+  addMetricRow(htmlParts, 'Salidas en gramos', totals.salidasGr, 'num');
+  addMetricRow(htmlParts, 'Saldo entradas - salidas', totals.saldoGr, 'num total');
+  addMetricRow(htmlParts, 'Valor entradas', totals.entradasValor, 'money');
+  addMetricRow(htmlParts, 'Valor salidas', totals.salidasValor, 'money');
+  addMetricRow(htmlParts, 'Saldo valor entradas - salidas', totals.saldoValor, 'money total');
+  htmlParts.push('</table>');
+
+  addSummaryTable(htmlParts, 'Resumen por tipo de movimiento', porTipoMovimiento);
+  addSummaryTable(htmlParts, 'Resumen por tipo de perfume', porTipoProducto);
+  addSummaryTable(htmlParts, 'Resumen por perfume', porProducto);
+  addSummaryTable(htmlParts, 'Resumen por mes', porMes);
+  addMovementDetailTable(htmlParts, rows, totals);
+  return htmlParts.join('');
+}
+
+function addMetricRow(parts, label, value, cls) {
+  parts.push(`<tr><td class="label">${xl(label)}</td>${xlCell(value, cls)}</tr>`);
+}
+
+function addSummaryTable(parts, title, rows) {
+  parts.push(`<h2>${xl(title)}</h2>`);
+  parts.push('<table>');
+  parts.push('<thead><tr><th>Concepto</th><th>Registros</th><th>Gramos</th><th>Neto</th><th>IVA</th><th>Total con IVA</th></tr></thead>');
+  parts.push('<tbody>');
+  if ((rows || []).length) {
+    rows.forEach(r => {
+      parts.push('<tr>');
+      parts.push(`<td>${xl(r.nombre)}</td>`);
+      parts.push(xlCell(r.registros, 'num'));
+      parts.push(xlCell(r.totalGramos, 'num'));
+      parts.push(xlCell(r.totalNeto, 'money'));
+      parts.push(xlCell(r.totalIVA, 'money'));
+      parts.push(xlCell(r.totalConIVA, 'money'));
+      parts.push('</tr>');
+    });
+  } else {
+    parts.push('<tr><td colspan="6">Sin datos.</td></tr>');
+  }
+  parts.push('</tbody></table>');
+}
+
+function addMovementDetailTable(parts, rows, totals) {
+  parts.push('<h2>Detalle de movimientos</h2>');
+  parts.push('<table>');
+  parts.push('<thead><tr><th>ID</th><th>Fecha</th><th>Hora</th><th>Producto ID</th><th>Fragancia</th><th>Tipo perfume</th><th>Tipo movimiento</th><th>Cantidad gr</th><th>Valor gramo</th><th>Neto</th><th>IVA</th><th>Total</th><th>Migrado</th><th>Usuario</th><th>Observaciones</th></tr></thead>');
+  parts.push('<tbody>');
+  if ((rows || []).length) {
+    rows.forEach(m => {
+      parts.push('<tr>');
+      parts.push(`<td>${xl(m.ID)}</td>`);
+      parts.push(`<td>${xl(m.Fecha)}</td>`);
+      parts.push(`<td>${xl(m.Hora)}</td>`);
+      parts.push(`<td>${xl(m.ProductoID)}</td>`);
+      parts.push(`<td>${xl(m.Fragancia)}</td>`);
+      parts.push(`<td>${xl(m.TipoProducto)}</td>`);
+      parts.push(`<td>${xl(m.TipoMovimiento)}</td>`);
+      parts.push(xlCell(m.CantidadGr, 'num'));
+      parts.push(xlCell(m.ValorGramo, 'money'));
+      parts.push(xlCell(m.ValorInicial, 'money'));
+      parts.push(xlCell(m.IVA, 'money'));
+      parts.push(xlCell(m.Total, 'money'));
+      parts.push(`<td>${xl(m.Migrado || 'NO')}</td>`);
+      parts.push(`<td>${xl(m.Usuario || '')}</td>`);
+      parts.push(`<td>${xl(m.Observaciones || '')}</td>`);
+      parts.push('</tr>');
+    });
+    parts.push('<tr>');
+    parts.push('<td class="total" colspan="7">TOTALES DETALLADOS</td>');
+    parts.push(xlCell(totals.totalGramos, 'num total'));
+    parts.push('<td class="total"></td>');
+    parts.push(xlCell(totals.totalNeto, 'money total'));
+    parts.push(xlCell(totals.totalIVA, 'money total'));
+    parts.push(xlCell(totals.totalConIVA, 'money total'));
+    parts.push('<td class="total" colspan="3"></td>');
+    parts.push('</tr>');
+  } else {
+    parts.push('<tr><td colspan="15">Sin datos para los filtros seleccionados.</td></tr>');
+  }
+  parts.push('</tbody></table>');
+}
+
+function xl(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
+function xlCell(value, cls = 'num') {
+  const n = Number(value || 0);
+  const safe = Number.isFinite(n) ? n.toFixed(2) : '0.00';
+  return `<td class="${cls}">${safe}</td>`;
+}
+
+function monthNameFromNumber(value) {
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const index = Number(value || 0) - 1;
+  return months[index] || String(value || 'Todos');
 }
 
 function downloadReportCsv() {
@@ -734,7 +1853,27 @@ function downloadReportCsv() {
 }
 
 function api(action, payload = {}) {
+  refreshDemoMode();
+
+  // Modo recomendado: HTML servido directamente desde Apps Script. No requiere API_URL.
+  if (hasGoogleScriptRun()) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler((res) => {
+          if (res && res.ok === false) reject(new Error(res.message || res.error || 'Error en Apps Script'));
+          else resolve(res || {});
+        })
+        .withFailureHandler((err) => {
+          reject(new Error((err && err.message) ? err.message : String(err || 'Error en Apps Script')));
+        })
+        .runAction(action, payload);
+    });
+  }
+
+  // Modo local de prueba: no guarda en Google Sheets.
   if (state.demo) return demoApi(action, payload);
+
+  // Modo externo: HTML abierto fuera de Apps Script usando la URL /exec.
   return new Promise((resolve, reject) => {
     const callback = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const script = document.createElement('script');
@@ -755,10 +1894,17 @@ function api(action, payload = {}) {
       script.remove();
     }
 
-    const url = API_URL + '?action=' + encodeURIComponent(action) + '&payload=' + encodeURIComponent(JSON.stringify(payload)) + '&callback=' + callback;
+    const cleanApiUrl = String(API_URL || '').trim();
+    if (!cleanApiUrl || cleanApiUrl.includes('PEGA_AQUI')) {
+      cleanup();
+      reject(new Error('API_URL está vacía. Abre la app desde la URL /exec de Apps Script o pega la URL /exec en API_URL.'));
+      return;
+    }
+
+    const url = cleanApiUrl + '?action=' + encodeURIComponent(action) + '&payload=' + encodeURIComponent(JSON.stringify(payload)) + '&callback=' + callback;
     script.onerror = () => {
       cleanup();
-      reject(new Error('No se pudo conectar con Apps Script. Revise API_URL.'));
+      reject(new Error('No se pudo conectar con Apps Script. Revise que API_URL termine en /exec y que la implementación esté pública con el enlace.'));
     };
     script.src = url;
     document.body.appendChild(script);
@@ -775,8 +1921,26 @@ function demoApi(action, payload) {
   const productById = id => db.products.find(p => p.ID === id);
   const nextId = (arr, prefix, digits) => prefix + String(arr.length + 1).padStart(digits, '0');
   const sign = t => ['COMPRA','ENTRADA','AJUSTE_ENTRADA','DEVOLUCION'].includes(t) ? 1 : ['VENTA','SALIDA','AJUSTE_SALIDA','MERMA'].includes(t) ? -1 : 0;
+  db.historial ||= [];
+  const addHistory = (accion, modulo, registroId, descripcion, antes, despues) => {
+    db.historial.push({
+      ID: 'HIS' + String(db.historial.length + 1).padStart(5, '0'),
+      FechaHora: new Date().toLocaleString(),
+      Fecha: today(),
+      Hora: new Date().toLocaleTimeString(),
+      Usuario: 'Vista local',
+      Accion: accion,
+      Modulo: modulo,
+      RegistroID: registroId,
+      Descripcion: descripcion || '',
+      AntesJSON: JSON.stringify(antes ?? null),
+      DespuesJSON: JSON.stringify(despues ?? null),
+      Restaurado: 'NO',
+      FechaRestauracion: ''
+    });
+  };
 
-  if (action === 'getInitialData') return ok({ productos: db.products, movimientos: db.movements.slice().reverse(), migraciones: db.migraciones, dashboard: computeDashboard(db.products, db.movements) });
+  if (action === 'getInitialData') return ok({ productos: db.products, movimientos: db.movements.slice().reverse(), migraciones: db.migraciones, historial: (db.historial || []).slice().reverse(), dashboard: computeDashboard(db.products, db.movements), personalizacion: { ...DEFAULT_PERSONALIZACION, ...getLocalPersonalizacion() } });
   if (action === 'listMovements') return ok({ movimientos: filterDemoMovements(db.movements, payload).reverse() });
   if (action === 'getDashboard') return ok({ dashboard: computeDashboard(db.products, db.movements) });
   if (action === 'saveProduct') {
@@ -788,15 +1952,21 @@ function demoApi(action, payload) {
       IVA: +payload.iva || 0.19, Proveedor: payload.proveedor || '', Estado: payload.estado || 'ACTIVO',
       FechaCreacion: today(), FechaActualizacion: today(), Observaciones: payload.observaciones || ''
     };
+    const before = idx >= 0 ? { ...db.products[idx] } : null;
     if (idx >= 0) db.products[idx] = { ...db.products[idx], ...item }; else db.products.push(item);
+    addHistory(idx >= 0 ? 'EDITAR' : 'AGREGAR', 'Productos', id, item.Fragancia, before, item);
     save(); return ok({ producto: item, message: idx >= 0 ? 'Producto actualizado en vista local' : 'Producto agregado en vista local' });
   }
   if (action === 'deleteProduct') {
-    db.products = db.products.filter(p => p.ID !== payload.id); save(); return ok({ message: 'Producto eliminado en vista local' });
+    const before = db.products.find(p => p.ID === payload.id) || null;
+    db.products = db.products.filter(p => p.ID !== payload.id);
+    addHistory('ELIMINAR', 'Productos', payload.id, before?.Fragancia || payload.id, before, null);
+    save(); return ok({ message: 'Producto eliminado en vista local' });
   }
   if (action === 'saveMovement') {
     const id = payload.id || nextId(db.movements, 'MOV', 4);
     const idx = db.movements.findIndex(m => m.ID === id);
+    const before = idx >= 0 ? { ...db.movements[idx] } : null;
     if (idx >= 0) {
       const old = db.movements[idx]; const pOld = productById(old.ProductoID); if (pOld) pOld.StockGr -= sign(old.TipoMovimiento) * Number(old.CantidadGr || 0);
     }
@@ -814,14 +1984,33 @@ function demoApi(action, payload) {
     };
     if (p) p.StockGr += sign(item.TipoMovimiento) * cantidad;
     if (idx >= 0) db.movements[idx] = item; else db.movements.push(item);
+    addHistory(idx >= 0 ? 'EDITAR' : 'AGREGAR', 'Movimientos', id, `${item.Fragancia} · ${item.TipoMovimiento} · ${item.CantidadGr} gr`, before, item);
     save(); return ok({ movimiento: item, message: idx >= 0 ? 'Movimiento actualizado en vista local' : 'Movimiento agregado en vista local' });
   }
   if (action === 'deleteMovement') {
     const old = db.movements.find(m => m.ID === payload.id);
     if (old) { const p = productById(old.ProductoID); if (p) p.StockGr -= sign(old.TipoMovimiento) * Number(old.CantidadGr || 0); }
-    db.movements = db.movements.filter(m => m.ID !== payload.id); save(); return ok({ message: 'Movimiento eliminado en vista local' });
+    db.movements = db.movements.filter(m => m.ID !== payload.id);
+    addHistory('ELIMINAR', 'Movimientos', payload.id, old ? `${old.Fragancia} · ${old.TipoMovimiento} · ${old.CantidadGr} gr` : payload.id, old || null, null);
+    save(); return ok({ message: 'Movimiento eliminado en vista local' });
   }
+  if (action === 'listHistorial') {
+    let rows = (db.historial || []).slice().reverse();
+    if (payload.desde) rows = rows.filter(h => h.Fecha >= payload.desde);
+    if (payload.hasta) rows = rows.filter(h => h.Fecha <= payload.hasta);
+    if (payload.accion) rows = rows.filter(h => h.Accion === payload.accion);
+    if (payload.modulo) rows = rows.filter(h => h.Modulo === payload.modulo);
+    if (payload.buscar) {
+      const q = String(payload.buscar).toLowerCase();
+      rows = rows.filter(h => JSON.stringify(h).toLowerCase().includes(q));
+    }
+    return ok({ historial: rows.slice(0, payload.limit || 500) });
+  }
+  if (action === 'restoreHistorial') return ok({ message: 'Restauración disponible al usar Google Sheets. En vista local solo se muestra el historial.', historial: (db.historial || []).slice().reverse() });
   if (action === 'getReportes') return ok(makeReport(filterDemoMovements(db.movements, payload), db.products));
+  if (action === 'getSettings') return ok({ personalizacion: { ...DEFAULT_PERSONALIZACION, ...getLocalPersonalizacion() } });
+  if (action === 'saveSettings') { const settings = { ...DEFAULT_PERSONALIZACION, ...(payload.settings || payload.personalizacion || payload) }; saveLocalPersonalizacion(settings); return ok({ message: 'Personalización guardada en vista local', personalizacion: settings }); }
+  if (action === 'resetSettings') { saveLocalPersonalizacion(DEFAULT_PERSONALIZACION); return ok({ message: 'Tema restaurado en vista local', personalizacion: DEFAULT_PERSONALIZACION }); }
   if (action === 'migrarMovimientos') {
     const rows = filterDemoMovements(db.movements, payload).filter(m => m.Migrado !== 'SI');
     rows.forEach(m => m.Migrado = 'SI');
@@ -841,7 +2030,7 @@ function initDemoDb() {
     const d = new Date(m.fecha + 'T00:00:00');
     return { ID: m.id, Fecha: m.fecha, Hora: '08:00:00', ProductoID: m.productoId, Fragancia: m.fragancia, TipoProducto: p?.Tipo || 'U', TipoMovimiento: m.tipoMovimiento, CantidadGr: cantidad, ValorGramo: valor, ValorInicial: neto, IVA: iva, Total: neto + iva, Mes: d.getMonth()+1, Anio: d.getFullYear(), Usuario: 'Sistema', Observaciones: m.observaciones, Migrado: 'NO', FechaActualizacion: today() };
   });
-  localStorage.setItem('perfumeInventoryDemo', JSON.stringify({ products, movements, migraciones: [] }));
+  localStorage.setItem('perfumeInventoryDemo', JSON.stringify({ products, movements, migraciones: [], historial: [] }));
 }
 
 function computeDemoDashboard() {
@@ -900,7 +2089,45 @@ function closeModal(id) { document.getElementById(id).classList.remove('show'); 
 function val(id) { return document.getElementById(id).value; }
 function setVal(id, value) { document.getElementById(id).value = value ?? ''; }
 function text(id, value) { document.getElementById(id).textContent = value; }
-function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3800); }
+
+async function withButtonLoading(buttonOrId, loadingText, task) {
+  const btn = typeof buttonOrId === 'string' ? document.getElementById(buttonOrId) : buttonOrId;
+  setButtonLoading(btn, true, loadingText || 'Guardando...');
+  try {
+    return await task();
+  } finally {
+    setButtonLoading(btn, false);
+  }
+}
+
+function setButtonLoading(btn, loading, text) {
+  if (!btn) return;
+  if (loading) {
+    if (!btn.dataset.originalHtml) btn.dataset.originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.classList.add('btn-loading');
+    btn.innerHTML = `<span class="spinner"></span>${escapeHtml(text || 'Guardando...')}`;
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+    btn.innerHTML = btn.dataset.originalHtml || 'Guardar';
+    delete btn.dataset.originalHtml;
+  }
+}
+
+
+function toast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show';
+  if (type === 'ok' || type === 'success') t.classList.add('ok');
+  if (type === 'error' || type === 'danger') t.classList.add('error');
+  if (type === 'warn' || type === 'warning') t.classList.add('warn');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => {
+    t.className = 'toast';
+  }, 4200);
+}
 function setStatus(msg, mode) { const b = document.getElementById('statusBadge'); b.className = 'badge ' + (mode || ''); b.textContent = (mode === 'ok' ? '✅ ' : mode === 'warn' ? '⚠ ' : '') + msg; document.getElementById('apiNotice').classList.toggle('hidden', !state.demo); }
 function escapeHtml(x) { return String(x ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
 function short(s, n) { s = String(s || ''); return s.length > n ? s.slice(0,n-1) + '…' : s; }
