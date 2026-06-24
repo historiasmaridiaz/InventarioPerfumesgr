@@ -906,7 +906,7 @@ Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
         <h2>Historial de cambios</h2>
         <p>Consulta registros agregados, editados o eliminados en inventario, ventas, compras, gastos y categorías.</p>
         <div class="toolbar"><div class="field"><label>Buscar</label><input id="buscarHistorial" placeholder="ID, acción, módulo o detalle" oninput="renderHistorial()"></div><button class="btn-ghost" onclick="loadAll()">↻ Actualizar</button></div>
-        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fecha</th><th>Acción</th><th>Módulo</th><th>Registro</th><th>Detalle</th></tr></thead><tbody id="historialBody"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fecha</th><th>Acción</th><th>Módulo</th><th>Registro</th><th>Detalle</th><th>Restaurar</th></tr></thead><tbody id="historialBody"></tbody></table></div>
       </div>
     </section>
 
@@ -976,7 +976,7 @@ Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
   <div id="toast" class="toast"></div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbztWNo_EGgJrzA-VQp23F_IP1jyQ5T4ZCzJ9SPu8Y7fc-fZhhO-p7H5eygEAs2jvTkZQQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxrIJPKLFa7z5wkXOkcuzSN3lAAfOXVNsLF30lqtokQmVRYNbeGggyGzeLjfDDl-gfUxw/exec';
 
 const DEFAULT_PERSONALIZACION = {
   appName: 'Sistema Contable Perfumería', logoEmoji: '⚗️', themeMode: 'light',
@@ -1593,6 +1593,19 @@ async function deleteRecord(action, id) {
   try { const res = await api(action, { id }); toast(res.message || 'Registro eliminado.', 'ok'); removeDeletedLocal(action, id); renderAll(); refreshAfterMutation(); } catch (err) { toast('No se pudo eliminar: ' + err.message, 'error'); }
 }
 
+async function restoreHistorial(id, accion, button) {
+  const action = String(accion || '').toUpperCase();
+  const label = action === 'AGREGAR' ? 'deshacer este registro agregado' : 'restaurar este cambio';
+  if (!confirm(`¿Seguro que deseas ${label}? El sistema ajustará inventario y stock cuando corresponda.`)) return;
+  try {
+    const res = await withButtonLoading(button, 'Restaurando...', () => api('restoreHistory', { id }));
+    toast(res.message || 'Historial restaurado correctamente.', 'ok');
+    await loadAll(true);
+  } catch (err) {
+    toast('No se pudo restaurar el historial: ' + err.message, 'error');
+  }
+}
+
 function setReportToday() { const d = today(); setVal('repDesde', d); setVal('repHasta', d); generateReport(); }
 function setReportCurrentMonth() { const now = new Date(); setVal('repDesde', new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10)); setVal('repHasta', today()); generateReport(); }
 
@@ -1860,7 +1873,7 @@ function xl(value) { return String(value ?? '').replace(/&/g, '&amp;').replace(/
 function renderHistorial() {
   const q = normal(val('buscarHistorial')); let rows = state.historial.slice().reverse(); if (q) rows = rows.filter(h => normal(JSON.stringify(h)).includes(q));
   const body = document.getElementById('historialBody');
-  body.innerHTML = rows.length ? rows.slice(0, 500).map(h => `<tr><td><b>${escapeHtml(h.ID)}</b></td><td>${escapeHtml(h.FechaHora || h.Fecha)}</td><td>${historyPill(h.Accion)}</td><td>${escapeHtml(h.Modulo)}</td><td>${escapeHtml(h.RegistroID)}</td><td>${escapeHtml(short(h.Descripcion || '', 80))}</td></tr>`).join('') : '<tr><td colspan="6" class="empty">Sin historial.</td></tr>';
+  body.innerHTML = rows.length ? rows.slice(0, 500).map(h => `<tr><td><b>${escapeHtml(h.ID)}</b></td><td>${escapeHtml(h.FechaHora || h.Fecha)}</td><td>${historyPill(h.Accion)}</td><td>${escapeHtml(h.Modulo)}</td><td>${escapeHtml(h.RegistroID)}</td><td>${escapeHtml(short(h.Descripcion || '', 80))}</td><td>${historyRestoreButton(h)}</td></tr>`).join('') : '<tr><td colspan="7" class="empty">Sin historial.</td></tr>';
 }
 
 function resolveProducto(value) {
@@ -1988,6 +2001,20 @@ function escapeAttr(v) { return String(v ?? '').replace(/'/g, '&#039;').replace(
 function pillTipo(t) { const raw = String(t || 'U').toUpperCase(); const labels = { M:'Hombre', F:'Mujer', U:'Unisex' }; const c = raw.toLowerCase(); return `<span class="pill ${c}">${escapeHtml(labels[raw] || raw)}</span>`; }
 function pillMetodo(m) { const x = String(m || '').toLowerCase(); const cls = x === 'nequi' ? 'nequi' : x === 'transferencia' ? 'transfer' : 'cash'; return `<span class="pill ${cls}">${escapeHtml(x || 'efectivo')}</span>`; }
 function historyPill(a) { a = String(a || '').toUpperCase(); const cls = a === 'ELIMINAR' ? 'out' : a === 'AGREGAR' ? 'in' : 'neutral'; return `<span class="pill ${cls}">${escapeHtml(a)}</span>`; }
+function historyRestoreButton(h) {
+  const action = String(h?.Accion || '').toUpperCase();
+  const before = safeHistoryJson(h?.AntesJSON);
+  const after = safeHistoryJson(h?.DespuesJSON);
+  const restoreable = action === 'AGREGAR' ? !!(after && after.ID) : ['EDITAR','ELIMINAR'].includes(action) && !!(before && before.ID);
+  if (!restoreable) return '<span class="muted">No aplica</span>';
+  const label = action === 'AGREGAR' ? 'Deshacer' : 'Restaurar';
+  return `<button class="btn-sm ${action === 'AGREGAR' ? 'btn-warning' : 'btn-ok'}" onclick="restoreHistorial('${escapeAttr(h.ID)}','${escapeAttr(action)}', this)">${label}</button>`;
+}
+function safeHistoryJson(raw) {
+  if (!raw) return null;
+  if (typeof raw === 'object') return raw;
+  try { const parsed = JSON.parse(String(raw)); return parsed && typeof parsed === 'object' ? parsed : null; } catch(e) { return null; }
+}
 
 function api(action, payload = {}) {
   refreshDemoMode();
