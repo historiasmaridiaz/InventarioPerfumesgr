@@ -255,6 +255,7 @@
     .pill.f { background:#fce7f3; color:#be185d; }
     .pill.m { background:#dbeafe; color:#1d4ed8; }
     .pill.u { background:#ede9fe; color:#6d28d9; }
+    .pill.a { background:#ffedd5; color:#c2410c; }
     .pill.in { background:#dcfce7; color:#166534; }
     .pill.out { background:#fee2e2; color:#991b1b; }
     .pill.neutral { background:#f1f5f9; color:#475569; }
@@ -485,6 +486,7 @@
     <datalist id="referenciasPagoList"></datalist>
     <datalist id="catTodasList"></datalist>
     <datalist id="stockGeneralList"></datalist>
+    <datalist id="envasesList"></datalist>
 
     <section id="dashboard" class="section active">
       <div id="apiNotice" class="notice">
@@ -549,7 +551,8 @@
           <form id="productoForm" class="form-grid" onsubmit="event.preventDefault(); saveProduct(this.querySelector('button[type=submit]'))">
             <input id="productoId" type="hidden">
             <div class="span-2"><label>Fragancia / perfume *</label><input id="productoNombre" placeholder="Ej.: GOOD GIRL F" required></div>
-            <div><label>Tipo</label><select id="productoTipo"><option value="M">Hombre</option><option value="F">Mujer</option><option value="U">Unisex</option></select></div>
+            <div><label>Categoría *</label><select id="productoTipo"><option value="M">Hombre</option><option value="F">Mujer</option><option value="U">Unisex</option><option value="A">Árabe</option></select></div>
+            <div><label>Fecha del inventario</label><input id="productoFechaInventario" type="date"></div>
             <div><label>Unidad base</label><select id="productoUnidadBase"><option value="gramos">Gramos de esencia</option></select></div>
             <div><label>Gramos disponibles</label><input id="productoStock" type="number" step="0.01" value="0"></div>
             <div><label>Stock mínimo en gramos</label><input id="productoMinimo" type="number" step="0.01" value="20"></div>
@@ -588,10 +591,10 @@
           <h3>Lista de perfumes</h3>
           <div class="toolbar">
             <div class="field"><label>Buscar perfumes</label><input id="buscarProducto" placeholder="Escribe perfume o ID" oninput="renderProducts()"></div>
-            <div class="field small"><label>Tipo</label><select id="filtroTipoProducto" onchange="renderProducts()"><option value="">Todos</option><option value="M">Hombre</option><option value="F">Mujer</option><option value="U">Unisex</option></select></div>
+            <div class="field small"><label>Categoría</label><select id="filtroTipoProducto" onchange="renderProducts()"><option value="">Todos</option><option value="M">Hombre</option><option value="F">Mujer</option><option value="U">Unisex</option><option value="A">Árabe</option></select></div>
             <button class="btn-ghost" onclick="loadAll()">↻ Actualizar</button>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fragancia</th><th>Tipo</th><th>Unidad</th><th class="right">Gramos disp.</th><th class="right">Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="productosBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fecha inventario</th><th>Fragancia</th><th>Categoría</th><th>Unidad</th><th class="right">Gramos disp.</th><th class="right">Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="productosBody"></tbody></table></div>
         </div>
 
         <div class="card">
@@ -687,18 +690,24 @@
     <section id="ventas" class="section">
       <div class="card">
         <h2>Ventas</h2>
-        <p>Registra dos tipos de venta: <b>Perfumes / esencias</b> y <b>Materia prima / insumos</b>. En ambos casos el sistema descuenta automáticamente el stock del inventario seleccionado. En perfumes también puede descontar envases, bolsas, feromonas u otros insumos si la categoría tiene perfil de consumo.</p>
+        <p>Registra ventas en dos modos: <b>Perfumes</b> y <b>Materias primas</b>. La vista de perfumes queda ordenada para evitar confusiones.</p>
+        <div class="toolbar" style="margin-bottom:12px"><button type="button" id="ventaTabPerfume" class="btn-primary" onclick="setVentaTipoUI('PERFUME')">Sección perfumes</button><button type="button" id="ventaTabMateria" class="btn-ghost" onclick="setVentaTipoUI('MATERIA_PRIMA')">Sección materias primas</button></div>
+        <div id="ventaModoInfo" class="formula-box" style="margin-bottom:12px">Sección perfumes: vende perfume/esencia, descuenta gramos del perfume, descuenta el ítem de envase stock y permite sumar materias primas adicionales al total.</div>
         <form id="ventaForm" class="form-grid" onsubmit="event.preventDefault(); saveVenta(this.querySelector('button[type=submit]'))">
           <input id="ventaId" type="hidden">
+          <input id="ventaTipo" type="hidden" value="PERFUME">
+          <input id="ventaCategoriaSearch" type="hidden" value="Perfumes">
+          <input id="ventaPresentacion" type="hidden" value="GRAMOS">
+          <input id="ventaEnvaseTamano" type="hidden" value="">
           <div><label>Fecha *</label><input id="ventaFecha" type="date" required></div>
           <div><label>Cliente</label><input id="ventaCliente" placeholder="Nombre del cliente"></div>
-          <div><label>Tipo de venta *</label><select id="ventaTipo" onchange="updateVentaMode()"><option value="PERFUME">Perfume / esencia</option><option value="MATERIA_PRIMA">Materia prima / insumo</option></select><div class="search-hint">Elige si descuentas gramos de perfume o stock de materia prima.</div></div>
-          <div class="span-2"><label id="ventaCategoriaLabel">Categoría *</label><input id="ventaCategoriaSearch" list="catVentaList" placeholder="Escribe o busca categoría de venta" required><div id="ventaCategoriaHint" class="search-hint">Ej.: Perfumes, por onzas, 1 2 y 3 o gramos.</div></div>
-          <div class="span-2"><label id="ventaProductoLabel">Perfume / esencia</label><input id="ventaProductoSearch" list="productosList" placeholder="Escribe para buscar perfume"><div id="ventaProductoHint" class="search-hint">Puedes escribir nombre o ID. Si lo seleccionas, se ajusta el stock.</div></div>
-          <div><label>Presentación</label><select id="ventaPresentacion" onchange="updateVentaEquivalencia()"><option value="1_ONZA">1 onza</option><option value="2_ONZAS">2 onzas</option><option value="3_ONZAS">3 onzas</option><option value="GRAMOS">Por gramos</option><option value="ML">Por ml</option><option value="UNIDADES">Unidades</option><option value="MATERIA_PRIMA">Materia prima</option></select></div>
-          <div><label>Unidad de medida</label><select id="ventaUnidad" onchange="updateVentaEquivalencia()"><option value="unidades">Unidades</option><option value="gramos">Gramos</option><option value="ml">ML</option></select></div>
-          <div><label>Cantidad *</label><input id="ventaCantidad" type="number" step="0.01" value="1" oninput="updateVentaTotal(); updateVentaEquivalencia()" required></div>
-          <div><label>Desc. stock</label><input id="ventaEquivalencia" type="number" step="0.01" value="30"><div id="ventaEquivalenciaHint" class="search-hint">Gr/ml que se restan del stock.</div></div>
+          <div class="span-2"><label id="ventaProductoLabel">Perfume / esencia *</label><input id="ventaProductoSearch" list="productosList" placeholder="Escribe para buscar perfume" oninput="onVentaProductoChange()" onchange="onVentaProductoChange()" required><div id="ventaProductoHint" class="search-hint">Busca el perfume. Al seleccionarlo se muestra nombre, categoría y stock.</div><div id="ventaProductoInfo" class="search-hint"></div></div>
+          <div class="span-2" id="ventaEnvaseWrap"><label>Ítem de envase stock</label><input id="ventaEnvaseSearch" list="envasesList" placeholder="Automático: envase con mayor stock"><div id="ventaEnvaseHint" class="search-hint">El sistema selecciona automáticamente un envase activo con stock desde la categoría Envases.</div></div>
+          <div><label>Cantidad *</label><input id="ventaCantidad" type="number" step="0.01" value="1" oninput="updateVentaTotal(); updateVentaEquivalencia(); updateVentaEnvaseFromPresentacion()" required></div>
+          <div id="ventaDescontarMateriaWrap"><label>Descontar materia prima</label><select id="ventaDescontarMateria" onchange="toggleVentaMateriaExtraPanel(); updateVentaTotal()"><option value="NO">NO</option><option value="SI">SI</option></select></div>
+          <div class="span-2" id="ventaMateriaExtraPanel"><label>Materia prima adicional a sumar y descontar</label><div class="search-hint">Cada línea agrega precio al total de la venta y descuenta esa materia prima del stock. Usa + Agregar para incluir más.</div><div class="form-grid" style="margin-top:8px"><div class="span-2"><label>Materia prima</label><input id="ventaMateriaExtraSearch" list="materiasList" placeholder="Buscar materia prima a descontar" onchange="applyVentaMateriaUnidad()" oninput="applyVentaMateriaUnidad()"></div><div><label>Cantidad</label><input id="ventaMateriaExtraCantidad" type="number" step="0.01" value="1"></div><div><label>Unidad</label><select id="ventaMateriaExtraUnidad"><option value="unidades">Unidades</option><option value="gramos">Gramos</option><option value="ml">ML</option></select></div><div><label>Precio venta</label><input id="ventaMateriaExtraPrecio" type="number" step="0.01" value="0" oninput="updateVentaTotal()"></div><div style="display:flex;align-items:end"><button type="button" class="btn-ghost" onclick="addVentaMateriaExtraLine()">+ Agregar</button></div></div><input id="ventaMateriaExtraLista" type="hidden"><div id="ventaMateriaExtraItems" class="search-hint" style="margin-top:8px">Sin materia prima adicional agregada.</div></div>
+          <div><label>Desc. Stock</label><input id="ventaEquivalencia" type="number" step="0.01" value="30" oninput="updateVentaTotal()"><div id="ventaEquivalenciaHint" class="search-hint">Gramos que se restan del stock de perfume.</div></div>
+          <div id="ventaUnidadWrap"><label id="ventaUnidadLabel">Unidad de descuento</label><input id="ventaUnidad" value="gramos" readonly><div id="ventaUnidadHint" class="search-hint">Fijo: gramos.</div></div>
           <div><label>Precio unitario *</label><input id="ventaPrecio" type="number" step="0.01" oninput="updateVentaTotal()" required></div>
           <div><label>IVA</label><input id="ventaIva" type="number" step="0.01" value="0" oninput="updateVentaTotal()"></div>
           <div><label>Método de pago</label><select id="ventaMetodo"><option value="efectivo">Efectivo</option><option value="nequi">Nequi</option><option value="transferencia">Transferencia</option></select></div>
@@ -710,7 +719,7 @@
       </div>
       <div class="card" style="margin-top:16px">
         <div class="toolbar"><div class="field"><label>Buscar ventas</label><input id="buscarVentas" placeholder="Cliente, perfume, categoría o método" oninput="renderVentas()"></div><div class="field small"><label>Método</label><select id="filtroVentaMetodo" onchange="renderVentas()"><option value="">Todos</option><option value="efectivo">Efectivo</option><option value="nequi">Nequi</option><option value="transferencia">Transferencia</option></select></div></div>
-        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Tipo</th><th>Categoría</th><th>Ítem</th><th>Presentación</th><th class="right">Cant.</th><th class="right">Total</th><th>Método</th><th>Acciones</th></tr></thead><tbody id="ventasBody"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Perfume/Materia prima</th><th>Cat. perfume</th><th>Envase/M.P.</th><th class="right">Cant.</th><th class="right">Desc. stock</th><th class="right">Total</th><th>Método</th><th>Acciones</th></tr></thead><tbody id="ventasBody"></tbody></table></div>
       </div>
     </section>
 
@@ -798,7 +807,7 @@
     <section id="categorias" class="section">
       <div class="card">
         <h2>Categorías</h2>
-        <p>Crea categorías para ventas, compras, gastos y pagos. En ventas puedes configurar perfiles de consumo para descontar perfume y materia prima automáticamente.</p>
+        <p>Crea categorías para ventas, materia prima, compras, gastos y pagos. Las ventas descuentan stock desde el formulario de ventas para evitar confusiones.</p>
         <form id="categoriaForm" class="form-grid" onsubmit="event.preventDefault(); saveCategoria(this.querySelector('button[type=submit]'))">
           <input id="categoriaId" type="hidden">
           <div><label>Módulo *</label><select id="categoriaModulo" required><option value="VENTA">Ventas</option><option value="MATERIA_PRIMA">Materia prima</option><option value="COMPRA">Compras</option><option value="GASTO">Gastos</option><option value="PAGO">Pagos</option></select></div>
@@ -809,30 +818,6 @@
           <div><label>Afecta inventario</label><select id="categoriaInventario"><option value="NO">NO</option><option value="SI">SI</option></select></div>
           <div><label>Estado</label><select id="categoriaEstado"><option>ACTIVO</option><option>INACTIVO</option></select></div>
 
-          <div class="full profile-panel">
-            <h3>Perfil automático de consumo para ventas</h3>
-            <p>Úsalo en categorías de venta para descontar automáticamente perfume, envase, perfumero, bolsa, feromonas u otros insumos de materia prima cada vez que guardes una venta con esta categoría.</p>
-            <div class="form-grid">
-              <div><label>Activar perfil</label><select id="categoriaPerfilActivo"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-              <div><label>ML presentación</label><input id="categoriaPerfilMl" type="number" step="0.01" placeholder="Ej.: 30"></div>
-              <div><label>Perfume por unidad</label><input id="categoriaPerfilPerfume" type="number" step="0.01" placeholder="Gr/ml descontados por unidad"></div>
-              <div><label>Unidad consumo</label><select id="categoriaPerfilUnidadPerfume"><option value="gramos">Gramos</option><option value="ml">ML</option></select></div>
-              <div class="span-2"><label>Envase según ml</label><input id="categoriaPerfilEnvase" list="materiasList" placeholder="Buscar envase en materia prima"></div>
-              <div><label>Cant. envase</label><input id="categoriaPerfilEnvaseCant" type="number" step="0.01" placeholder="Ej.: 1"></div>
-              <div><label>Unidad</label><select id="categoriaPerfilEnvaseUnidad"><option value="unidades">Unidades</option><option value="gramos">Gramos</option><option value="ml">ML</option></select></div>
-              <div class="span-2"><label>Perfumero si aplica</label><input id="categoriaPerfilPerfumero" list="materiasList" placeholder="Buscar perfumero"></div>
-              <div><label>Cant. perfumero</label><input id="categoriaPerfilPerfumeroCant" type="number" step="0.01" placeholder="Ej.: 1"></div>
-              <div><label>Unidad</label><select id="categoriaPerfilPerfumeroUnidad"><option value="unidades">Unidades</option><option value="gramos">Gramos</option><option value="ml">ML</option></select></div>
-              <div class="span-2"><label>Bolsa si aplica</label><input id="categoriaPerfilBolsa" list="materiasList" placeholder="Buscar bolsa"></div>
-              <div><label>Cant. bolsa</label><input id="categoriaPerfilBolsaCant" type="number" step="0.01" placeholder="Ej.: 1"></div>
-              <div><label>Unidad</label><select id="categoriaPerfilBolsaUnidad"><option value="unidades">Unidades</option><option value="gramos">Gramos</option><option value="ml">ML</option></select></div>
-              <div class="span-2"><label>Feromonas si aplica</label><input id="categoriaPerfilFeromonas" list="materiasList" placeholder="Buscar feromonas"></div>
-              <div><label>Gramos feromonas</label><input id="categoriaPerfilFeromonasCant" type="number" step="0.01" placeholder="Ej.: 0.5"></div>
-              <div><label>Unidad</label><select id="categoriaPerfilFeromonasUnidad"><option value="gramos">Gramos</option><option value="ml">ML</option><option value="unidades">Unidades</option></select></div>
-              <div class="full"><label>Otros insumos extra</label><textarea id="categoriaPerfilExtra" rows="3" placeholder="Una línea por insumo: MAT001 - Nombre | cantidad | unidad | modo
-Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
-            </div>
-          </div>
 
           <div class="full"><label>Observaciones</label><textarea id="categoriaObs" rows="2"></textarea></div>
           <div class="full toolbar" style="justify-content:flex-end;margin:0"><button type="button" class="btn-ghost" onclick="clearCategoriaForm()">Limpiar</button><button type="submit" class="btn-primary">Guardar categoría</button></div>
@@ -840,14 +825,14 @@ Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
       </div>
       <div class="card" style="margin-top:16px">
         <div class="toolbar"><div class="field"><label>Buscar categorías</label><input id="buscarCategorias" placeholder="Nombre, módulo o unidad" oninput="renderCategorias()"></div><div class="field small"><label>Módulo</label><select id="filtroCategoriaModulo" onchange="renderCategorias()"><option value="">Todos</option><option value="VENTA">Ventas</option><option value="MATERIA_PRIMA">Materia prima</option><option value="COMPRA">Compras</option><option value="GASTO">Gastos</option><option value="PAGO">Pagos</option></select></div><button class="btn-warning" onclick="seedCategorias(this)">Cargar categorías base</button></div>
-        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Módulo</th><th>Nombre</th><th>Unidad</th><th class="right">Precio base</th><th>Inventario</th><th>Perfil venta</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="categoriasBody"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Módulo</th><th>Nombre</th><th>Unidad</th><th class="right">Precio base</th><th>Inventario</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="categoriasBody"></tbody></table></div>
       </div>
     </section>
 
     <section id="informes" class="section">
       <div class="card">
         <h2>Generador de informes</h2>
-        <p>Filtra ventas, compras, gastos, pagos y movimientos de inventario por la fecha o rango que elijas, con resumen general y detalle por categoría.</p>
+        <p>Filtra ventas, compras, gastos, pagos y movimientos de inventario por el rango de fechas y filtros que apliques. El Excel se descarga usando exactamente esos filtros.</p>
         <div class="toolbar">
           <div class="field"><label>Desde</label><input id="repDesde" type="date"></div>
           <div class="field"><label>Hasta</label><input id="repHasta" type="date"></div>
@@ -857,16 +842,18 @@ Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
           <button class="btn-ghost" onclick="setReportToday()">Hoy</button>
           <button class="btn-ghost" onclick="setReportCurrentMonth()">Mes actual</button>
           <button class="btn-primary" onclick="generateReportAsync(this)">Generar informe</button>
-          <button class="btn-ok" onclick="downloadReportExcel(this)">⬇ Excel</button>
+          <button class="btn-ok" onclick="downloadReportExcel(this)">⬇ Excel detallado</button>
           <button class="btn-ghost" onclick="downloadReportCsv()">CSV</button>
           <button class="btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+          <button class="btn-primary" onclick="openReportDrive(this)">📁 Drive</button>
         </div>
       </div>
       <div class="grid kpis" style="margin-top:16px">
         <div class="card kpi"><div class="label">Registros</div><div class="value" id="repRegistros">0</div></div>
-        <div class="card kpi"><div class="label">Ventas</div><div class="value" id="repVentas">$0</div></div>
-        <div class="card kpi"><div class="label">Compras</div><div class="value" id="repCompras">$0</div></div>
-        <div class="card kpi"><div class="label">Gastos</div><div class="value" id="repGastos">$0</div></div>
+        <div class="card kpi"><div class="label">Ventas</div><div class="value" id="repVentas">$0</div><small id="repRegVentas">0 registros</small></div>
+        <div class="card kpi"><div class="label">Compras</div><div class="value" id="repCompras">$0</div><small id="repRegCompras">0 registros</small></div>
+        <div class="card kpi"><div class="label">Gastos</div><div class="value" id="repGastos">$0</div><small id="repRegGastos">0 registros</small></div>
+        <div class="card kpi"><div class="label">Resultado</div><div class="value" id="repResultado">$0</div></div>
       </div>
       <div class="grid two" style="margin-top:16px">
         <div class="card report-box">
@@ -876,6 +863,30 @@ Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
         <div class="card report-box">
           <h3>Movimientos por método de pago</h3>
           <div id="repMetodoResumen" class="mini-list"></div>
+        </div>
+      </div>
+      <div class="grid two" style="margin-top:16px">
+        <div class="card report-box">
+          <h3>Totales por módulo</h3>
+          <div class="table-wrap"><table><thead><tr><th>Módulo</th><th class="right">Registros</th><th class="right">Cantidad</th><th class="right">Total</th></tr></thead><tbody id="repModuloResumen"></tbody></table></div>
+          <div class="mobile-scroll-note">Desliza la tabla hacia los lados en móvil.</div>
+        </div>
+        <div class="card report-box">
+          <h3>Ventas clasificadas</h3>
+          <div class="table-wrap"><table><thead><tr><th>Categoría</th><th class="right">Registros</th><th class="right">Cantidad</th><th class="right">Total</th></tr></thead><tbody id="repVentasClasificadas"></tbody></table></div>
+          <div class="mobile-scroll-note">Desliza la tabla hacia los lados en móvil.</div>
+        </div>
+      </div>
+      <div class="grid two" style="margin-top:16px">
+        <div class="card report-box">
+          <h3>Compras clasificadas</h3>
+          <div class="table-wrap"><table><thead><tr><th>Categoría</th><th class="right">Registros</th><th class="right">Cantidad</th><th class="right">Total</th></tr></thead><tbody id="repComprasClasificadas"></tbody></table></div>
+          <div class="mobile-scroll-note">Desliza la tabla hacia los lados en móvil.</div>
+        </div>
+        <div class="card report-box">
+          <h3>Gastos clasificados</h3>
+          <div class="table-wrap"><table><thead><tr><th>Categoría</th><th class="right">Registros</th><th class="right">Cantidad</th><th class="right">Total</th></tr></thead><tbody id="repGastosClasificados"></tbody></table></div>
+          <div class="mobile-scroll-note">Desliza la tabla hacia los lados en móvil.</div>
         </div>
       </div>
       <div class="grid two" style="margin-top:16px">
@@ -957,16 +968,17 @@ Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
       <div class="card">
         <h2>Manual de funcionamiento</h2>
         <p>El sistema está organizado para una perfumería que vende por onzas, gramos, ml y unidades, y registra compras y gastos con métodos de pago.</p>
-        <div class="formula-box">Resultado = Ventas - Compras - Gastos<br>Venta con perfume seleccionado = resta inventario<br>Compra con “actualiza inventario = SI” = suma inventario</div>
+        <div class="formula-box">Resultado = Ventas - Compras - Gastos<br>Inventario de perfume = guarda fecha y categoría: Hombre, Mujer, Unisex o Árabe<br>Venta con perfume seleccionado = resta inventario, envase stock y materia prima marcada<br>Informe Excel = descarga resumen, ventas, compras, gastos clasificados, gráficas y hoja antes/después de descuento de stock<br>Compra con “actualiza inventario = SI” = suma inventario</div>
       </div>
       <div class="manual-grid three" style="margin-top:16px">
-        <div class="card manual-card"><h3>Ventas</h3><ul><li>Categorías base: Perfumes, por onzas, 1, 2, 3 onzas o gramos.</li><li>Permite vender por unidades, gramos o ml.</li><li>Permite pago por efectivo, Nequi o transferencia.</li><li>Si seleccionas perfume, descuenta gramos del inventario de perfumes y del Stock General vinculado.</li><li>También puedes cambiar a venta de materia prima para vender envases, bolsas, feromonas, perfumes pequeños u otros insumos por separado; el stock se descuenta automáticamente.</li></ul></div>
+        <div class="card manual-card"><h3>Ventas</h3><ul><li>Ventas tiene dos secciones: perfumes y materias primas.</li><li>En perfumes el orden del formulario queda limpio: fecha, cliente, perfume/esencia, ítem de envase stock, cantidad, materia prima adicional, descuento de stock, unidad, precio, IVA, método, total y observaciones.</li><li>El ítem de envase stock se autoselecciona desde la categoría Envases según disponibilidad de stock.</li><li>Las materias primas adicionales agregan precio al total como venta adicional y también descuentan stock.</li><li>En materias primas se ocultan envase y materias adicionales para evitar confusión.</li></ul></div>
         <div class="card manual-card"><h3>Compras</h3><ul><li>Categorías base: bolsas, envases por onzas, perfumeros, rolón, inventario, esencias gr, frascos cafés y feromonas.</li><li>Puedes marcar si actualiza inventario.</li><li>Permite unidades, gramos y ml.</li><li>Si actualiza inventario, suma al inventario relacionado y al Stock General vinculado.</li></ul></div>
         <div class="card manual-card"><h3>Gastos y pagos</h3><ul><li>Categorías base: gastos varios, unidades, servicios públicos, luz y pago de nómina.</li><li>No afecta inventario.</li><li>Permite registrar estado pagado o pendiente.</li></ul></div>
       </div>
       <div class="manual-grid" style="margin-top:16px">
-        <div class="card manual-card"><h3>Categorías</h3><ul><li>Puedes crear categorías nuevas para ventas, materia prima, compras, gastos y pagos.</li><li>Las categorías de materia prima aparecen en el formulario de materias primas.</li><li>Al guardar, aparecen en las listas desplegables.</li><li>Los campos de categoría permiten escribir para buscar.</li><li>En categorías de venta puedes guardar un perfil o receta para que cada venta actualice materias primas automáticamente.</li></ul></div>
-        <div class="card manual-card"><h3>Conexión</h3><ol><li>Pega <b>code.gs</b> en Apps Script.</li><li>Ejecuta <b>configurarSistemaContable()</b>.</li><li>Despliega como aplicación web.</li><li>Pega la URL <b>/exec</b> en <b>API_URL</b> del HTML.</li></ol></div>
+        <div class="card manual-card"><h3>Categorías</h3><ul><li>Puedes crear categorías nuevas para ventas, materia prima, compras, gastos y pagos.</li><li>Las categorías de materia prima aparecen en el formulario de materias primas.</li><li>Al guardar, aparecen en las listas desplegables.</li><li>Los campos de categoría permiten escribir para buscar.</li><li>El descuento de envases y materias primas se controla directamente desde Ventas.</li></ul></div>
+        <div class="card manual-card"><h3>Informes Excel</h3><ul><li>El botón Excel descarga un archivo detallado respetando el rango de fechas, tipo, categoría y método de pago aplicados.</li><li>Incluye hojas de resumen, filtros aplicados, totales clasificados, ventas, compras, gastos, detalle completo, gráficas, inventario actual, movimientos de stock y antes/después de descuento de stock.</li><li>El botón Drive abre el archivo principal de Google Sheets conectado al sistema para revisar o compartir la información.</li><li>La hoja antes/después muestra el stock antes, la cantidad descontada o sumada y el stock después del movimiento.</li></ul></div>
+        <div class="card manual-card"><h3>Conexión</h3><ol><li>Pega el archivo <b>code.gs</b> incluido en Apps Script.</li><li>Ejecuta <b>configurarSistemaContable()</b> o usa el botón “Inicializar hojas y categorías”.</li><li>Despliega como aplicación web.</li><li>Pega la URL <b>/exec</b> en <b>API_URL</b> del HTML.</li></ol></div>
       </div>
     </section>
   </main>
@@ -976,7 +988,7 @@ Modos: por_unidad, por_venta, por_ml, por_gramo"></textarea></div>
   <div id="toast" class="toast"></div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbxrIJPKLFa7z5wkXOkcuzSN3lAAfOXVNsLF30lqtokQmVRYNbeGggyGzeLjfDDl-gfUxw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwnJrG3xoR0VK0NjpoTov3yvOaPBif5YgHGS6pfPiFEDaDbCtRbFDNvelkeBagU3xswWw/exec';
 
 const DEFAULT_PERSONALIZACION = {
   appName: 'Sistema Contable Perfumería', logoEmoji: '⚗️', themeMode: 'light',
@@ -1004,6 +1016,10 @@ const SEED_CATEGORIAS = [
   {Modulo:'MATERIA_PRIMA', Nombre:'Feromonas', UnidadSugerida:'gramos', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Categoría de materia prima para feromonas'},
   {Modulo:'MATERIA_PRIMA', Nombre:'Complementos vasos', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Vasos, recipientes o complementos similares'},
   {Modulo:'MATERIA_PRIMA', Nombre:'Complementos frascos', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Frascos, tapas, atomizadores y complementos de envase'},
+  {Modulo:'MATERIA_PRIMA', Nombre:'Envases', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Categoría general de envases para ventas de perfumes'},
+  {Modulo:'MATERIA_PRIMA', Nombre:'Envases 1 onza', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Envases para ventas de perfumes de 1 onza'},
+  {Modulo:'MATERIA_PRIMA', Nombre:'Envases 2 onzas', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Envases para ventas de perfumes de 2 onzas'},
+  {Modulo:'MATERIA_PRIMA', Nombre:'Envases 3 onzas', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Envases para ventas de perfumes de 3 onzas'},
   {Modulo:'MATERIA_PRIMA', Nombre:'Perfumes pequeños', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Presentaciones pequeñas o muestras'},
   {Modulo:'MATERIA_PRIMA', Nombre:'Bolsas y empaque', UnidadSugerida:'unidades', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Bolsas, empaques y material de entrega'},
   {Modulo:'MATERIA_PRIMA', Nombre:'Esencias', UnidadSugerida:'gramos', PrecioBase:0, IVA:0, AfectaInventario:'SI', Estado:'ACTIVO', Observaciones:'Esencias controladas por gramos'},
@@ -1020,9 +1036,10 @@ const SEED_CATEGORIAS = [
 
 const state = {
   productos: [], materias: [], ventas: [], compras: [], gastos: [], pagos: [], categorias: [], historial: [], stockGeneral: [], stockMovimientos: [], dashboard: {},
-  personalizacion: { ...DEFAULT_PERSONALIZACION }, lastReport: null, demo: false
+  personalizacion: { ...DEFAULT_PERSONALIZACION }, lastReport: null, lastReportDriveUrl: '', lastReportSpreadsheetId: '', demo: false
 };
 
+const MASTER_DRIVE_REPORT_URL = 'https://docs.google.com/spreadsheets/d/1wGQm5PB8r07V6bgVBg-2-a06EhEsLQMp3Prau7r7eVk/edit?gid=825241946#gid=825241946';
 const JSONP_TIMEOUT_MS = 45000;
 let loadAllPromise = null;
 
@@ -1065,7 +1082,7 @@ function normalizeDateValue(value) {
 function normalizeDateRows(rows) {
   return (rows || []).map(row => {
     const out = { ...row };
-    ['Fecha','FechaCreacion','FechaActualizacion'].forEach(k => {
+    ['Fecha','FechaInventario','FechaCreacion','FechaActualizacion'].forEach(k => {
       if (out[k] !== undefined && out[k] !== '') out[k] = normalizeDateValue(out[k]) || out[k];
     });
     return out;
@@ -1088,7 +1105,7 @@ function fmtNum(n) {
 
 document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
-  setVal('ventaFecha', today()); setVal('compraFecha', today()); setVal('gastoFecha', today()); setVal('pagoFecha', today()); setVal('stockMovimientoFecha', today());
+  setVal('ventaFecha', today()); setVal('compraFecha', today()); setVal('gastoFecha', today()); setVal('pagoFecha', today()); setVal('stockMovimientoFecha', today()); setVal('productoFechaInventario', today());
   setVal('repDesde', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10));
   setVal('repHasta', today());
   ['ventaCantidad','ventaPrecio','ventaIva'].forEach(id => document.getElementById(id)?.addEventListener('input', updateVentaTotal));
@@ -1096,6 +1113,10 @@ document.addEventListener('DOMContentLoaded', () => {
   ['gastoCantidad','gastoValor','gastoIva'].forEach(id => document.getElementById(id)?.addEventListener('input', updateGastoTotal));
   ['pagoCantidad','pagoValor','pagoIva'].forEach(id => document.getElementById(id)?.addEventListener('input', updatePagoTotal));
   ['ventaProductoSearch','compraProductoSearch'].forEach(id => document.getElementById(id)?.addEventListener('change', applyProductDefaultPrices));
+  document.getElementById('ventaProductoSearch')?.addEventListener('input', updateVentaPerfumeInfo);
+  document.getElementById('ventaEnvaseSearch')?.addEventListener('change', updateVentaEnvaseHint);
+  document.getElementById('ventaMateriaExtraSearch')?.addEventListener('change', applyVentaMateriaUnidad);
+  document.getElementById('ventaMateriaExtraPrecio')?.addEventListener('input', updateVentaTotal);
   document.getElementById('ventaTipo')?.addEventListener('change', updateVentaMode);
   document.getElementById('materiaCategoriaSearch')?.addEventListener('change', applyMateriaCategoryDefault);
   document.getElementById('categoriaModulo')?.addEventListener('change', toggleCategoriaPerfilPanel);
@@ -1103,7 +1124,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ['settingThemeMode','settingPrimaryColor','settingPrimaryDarkColor','settingSecondaryColor','settingBackgroundColor','settingCardColor','settingTextColor','settingBorderColor','settingDarkBackgroundColor','settingDarkCardColor','settingDarkTextColor','settingDarkBorderColor','settingAccentColor','settingAppName','settingLogoEmoji','settingCurrencyCode','settingLocale','settingRadiusPx'].forEach(id => document.getElementById(id)?.addEventListener('input', previewPersonalizacionFromForm));
   applyTheme(state.personalizacion);
   toggleCategoriaPerfilPanel();
-  updateVentaMode(); updateVentaEquivalencia(); updateVentaTotal(); updateCompraTotal(); updateGastoTotal(); updatePagoTotal();
+  updateVentaMode(); setVal('ventaCategoriaSearch','Perfumes'); updateVentaEquivalencia(true); updateVentaTotal(); toggleVentaMateriaExtraPanel(); updateVentaEnvaseFromPresentacion(); updateCompraTotal(); updateGastoTotal(); updatePagoTotal();
   loadAll();
 });
 
@@ -1257,10 +1278,12 @@ function finishMutation(action, res, payload) {
 }
 
 function renderDatalists() {
-  const perfumes = state.productos.filter(p => (p.Estado || 'ACTIVO') === 'ACTIVO').map(p => `${p.ID} - ${p.Fragancia}`);
-  const materias = state.materias.filter(m => (m.Estado || 'ACTIVO') === 'ACTIVO').map(m => `${m.ID} - ${m.Nombre}`);
+  const perfumes = state.productos.filter(p => (p.Estado || 'ACTIVO') === 'ACTIVO').map(p => ({ value: `${p.ID} - ${p.Fragancia} | ${tipoPerfumeLabel(p.Tipo)}`, label: tipoPerfumeLabel(p.Tipo) }));
+  const materias = state.materias.filter(m => (m.Estado || 'ACTIVO') === 'ACTIVO').map(m => ({ value: `${m.ID} - ${m.Nombre}${m.Categoria ? ' | ' + m.Categoria : ''}`, label: m.Categoria || '' }));
+  const envases = state.materias.filter(m => (m.Estado || 'ACTIVO') === 'ACTIVO' && isEnvaseMateria(m)).map(m => ({ value: `${m.ID} - ${m.Nombre}${m.Categoria ? ' | ' + m.Categoria : ''}`, label: `${envaseTamanoLabel(detectEnvaseTamano(m)) || m.Categoria || 'Envases'} · Stock ${fmtNum(materiaStock(m))}` }));
   fillDatalist('productosList', perfumes);
   fillDatalist('materiasList', materias);
+  fillDatalist('envasesList', envases.length ? envases : materias);
   fillDatalist('inventarioList', perfumes.concat(materias));
   fillDatalist('catVentaList', getCategorias('VENTA').map(c => `${c.ID} - ${c.Nombre}`));
   fillDatalist('catCompraList', getCategorias('COMPRA').map(c => `${c.ID} - ${c.Nombre}`));
@@ -1271,7 +1294,7 @@ function renderDatalists() {
   fillDatalist('catTodasList', state.categorias.filter(c => (c.Estado || 'ACTIVO') === 'ACTIVO').map(c => `${c.ID} - ${c.Nombre}`));
   fillDatalist('stockGeneralList', (state.stockGeneral || []).filter(s => (s.Estado || 'ACTIVO') === 'ACTIVO').map(s => `${s.ID} - ${s.Nombre}`));
 }
-function fillDatalist(id, values) { const list = document.getElementById(id); if (!list) return; list.innerHTML = values.map(v => `<option value="${escapeHtml(v)}"></option>`).join(''); }
+function fillDatalist(id, values) { const list = document.getElementById(id); if (!list) return; list.innerHTML = values.map(v => { const obj = typeof v === 'object' ? v : { value:v, label:'' }; return `<option value="${escapeHtml(obj.value)}"${obj.label ? ` label="${escapeHtml(obj.label)}"` : ''}></option>`; }).join(''); }
 function getCategorias(modulo) { return state.categorias.filter(c => c.Modulo === modulo && (c.Estado || 'ACTIVO') === 'ACTIVO'); }
 function getPaymentReferences() {
   return []
@@ -1383,16 +1406,17 @@ async function saveStockMovement(button) {
 function renderProducts() {
   const q = normal(val('buscarProducto')); const tipo = val('filtroTipoProducto');
   let rows = state.productos.slice();
-  if (q) rows = rows.filter(p => normal(`${p.ID} ${p.Fragancia}`).includes(q));
-  if (tipo) rows = rows.filter(p => p.Tipo === tipo);
+  if (q) rows = rows.filter(p => normal(`${p.ID} ${p.Fragancia} ${tipoPerfumeLabel(p.Tipo)} ${p.Categoria || ''} ${p.FechaInventario || ''}`).includes(q));
+  if (tipo) rows = rows.filter(p => String(p.Tipo || '').toUpperCase() === tipo);
   const body = document.getElementById('productosBody');
-  body.innerHTML = rows.length ? rows.map(p => `<tr><td><b>${escapeHtml(p.ID)}</b></td><td>${escapeHtml(p.Fragancia)}</td><td>${pillTipo(p.Tipo)}</td><td>${escapeHtml(p.UnidadBase || 'gramos')}</td><td class="right">${fmtNum(p.Stock)}</td><td class="right">${fmtNum(p.StockMinimo)}</td><td>${escapeHtml(p.Estado || 'ACTIVO')}</td><td><div class="actions"><button class="btn-sm btn-ghost" onclick='editProduct(${encodeRow(p)})'>Editar</button><button class="btn-sm btn-danger" onclick="deleteRecord('deleteProduct','${escapeAttr(p.ID)}')">Eliminar</button></div></td></tr>`).join('') : '<tr><td colspan="8" class="empty">No hay perfumes registrados.</td></tr>';
+  body.innerHTML = rows.length ? rows.map(p => `<tr><td><b>${escapeHtml(p.ID)}</b></td><td>${escapeHtml(normalizeDateValue(p.FechaInventario || p.FechaCreacion || '') || '')}</td><td>${escapeHtml(p.Fragancia)}</td><td>${pillTipo(p.Tipo)}</td><td>${escapeHtml(p.UnidadBase || 'gramos')}</td><td class="right">${fmtNum(p.Stock)}</td><td class="right">${fmtNum(p.StockMinimo)}</td><td>${escapeHtml(p.Estado || 'ACTIVO')}</td><td><div class="actions"><button class="btn-sm btn-ghost" onclick='editProduct(${encodeRow(p)})'>Editar</button><button class="btn-sm btn-danger" onclick="deleteRecord('deleteProduct','${escapeAttr(p.ID)}')">Eliminar</button></div></td></tr>`).join('') : '<tr><td colspan="9" class="empty">No hay perfumes registrados.</td></tr>';
 }
 
-function editProduct(p) { setVal('productoId', p.ID); setVal('productoNombre', p.Fragancia); setVal('productoTipo', p.Tipo || 'U'); setVal('productoUnidadBase', 'gramos'); setVal('productoStock', p.Stock || 0); setVal('productoMinimo', p.StockMinimo || 20); setVal('productoEstado', p.Estado || 'ACTIVO'); setVal('productoObs', p.Observaciones || ''); window.scrollTo({top:0, behavior:'smooth'}); }
-function clearProductForm() { document.getElementById('productoForm').reset(); setVal('productoId',''); setVal('productoUnidadBase','gramos'); setVal('productoStock',0); setVal('productoMinimo',20); }
+function editProduct(p) { setVal('productoId', p.ID); setVal('productoNombre', p.Fragancia); setVal('productoTipo', String(p.Tipo || 'U').toUpperCase()); setVal('productoFechaInventario', normalizeDateValue(p.FechaInventario || p.FechaCreacion || today()) || today()); setVal('productoUnidadBase', 'gramos'); setVal('productoStock', p.Stock || 0); setVal('productoMinimo', p.StockMinimo || 20); setVal('productoEstado', p.Estado || 'ACTIVO'); setVal('productoObs', p.Observaciones || ''); window.scrollTo({top:0, behavior:'smooth'}); }
+function clearProductForm() { document.getElementById('productoForm').reset(); setVal('productoId',''); setVal('productoFechaInventario', today()); setVal('productoUnidadBase','gramos'); setVal('productoStock',0); setVal('productoMinimo',20); }
 async function saveProduct(button) {
-  const payload = { id: val('productoId'), fragancia: val('productoNombre'), tipo: val('productoTipo'), unidadBase: 'gramos', stock: val('productoStock'), stockMinimo: val('productoMinimo'), estado: val('productoEstado'), observaciones: val('productoObs') };
+  const tipo = String(val('productoTipo') || 'U').toUpperCase();
+  const payload = { id: val('productoId'), fragancia: val('productoNombre'), tipo, categoria: tipoPerfumeLabel(tipo), fechaInventario: val('productoFechaInventario') || today(), unidadBase: 'gramos', stock: val('productoStock'), stockMinimo: val('productoMinimo'), estado: val('productoEstado'), observaciones: val('productoObs') };
   if (!payload.fragancia) return toast('Ingrese el nombre del perfume.', 'warn');
   try { const res = await withButtonLoading(button, 'Guardando...', () => api('saveProduct', payload)); toast(res.message || 'Perfume guardado.', 'ok'); clearProductForm(); finishMutation('saveProduct', res, payload); } catch (err) { toast('No se pudo guardar: ' + err.message, 'error'); }
 }
@@ -1423,48 +1447,217 @@ function currentVentaTipo() {
 function ventaTipoLabel(tipo) {
   return tipo === 'MATERIA_PRIMA' ? 'Materia prima' : 'Perfume';
 }
-function updateVentaMode() {
+function setVentaRowVisible(id, visible) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('hidden', !visible);
+}
+function setVentaUnidadBloqueada(bloqueada, unidad) {
+  const el = document.getElementById('ventaUnidad');
+  if (!el) return;
+  if (unidad) setVal('ventaUnidad', unidad);
+  el.disabled = !!bloqueada;
+}
+function unidadMateriaVentaActual() {
+  const item = resolveMateria(val('ventaProductoSearch')).item;
+  return item?.UnidadBase || 'unidades';
+}
+function onVentaProductoChange() {
   const tipo = currentVentaTipo();
-  const form = document.getElementById('ventaForm');
-  if (form && form.dataset.ventaTipo && form.dataset.ventaTipo !== tipo) {
-    setVal('ventaCategoriaSearch', '');
-    setVal('ventaProductoSearch', '');
-    setVal('ventaEquivalencia', tipo === 'MATERIA_PRIMA' ? num(val('ventaCantidad') || 1) : 30);
-  }
-  if (form) form.dataset.ventaTipo = tipo;
-  const catInput = document.getElementById('ventaCategoriaSearch');
-  const itemInput = document.getElementById('ventaProductoSearch');
-  const catLabel = document.getElementById('ventaCategoriaLabel');
-  const itemLabel = document.getElementById('ventaProductoLabel');
-  const catHint = document.getElementById('ventaCategoriaHint');
-  const itemHint = document.getElementById('ventaProductoHint');
-  const eqHint = document.getElementById('ventaEquivalenciaHint');
-  if (tipo === 'MATERIA_PRIMA') {
-    catInput?.setAttribute('list', 'catMateriaList');
-    itemInput?.setAttribute('list', 'materiasList');
-    if (catLabel) catLabel.textContent = 'Categoría materia prima *';
-    if (itemLabel) itemLabel.textContent = 'Materia prima / insumo';
-    if (catHint) catHint.textContent = 'Ej.: Feromonas, Complementos frascos, Bolsas y empaque, Perfumes pequeños o Esencias.';
-    if (itemHint) itemHint.textContent = 'Selecciona el insumo exacto. Al guardar se descuenta su stock.';
-    if (eqHint) eqHint.textContent = 'Cantidad que se resta del stock de materia prima.';
-    if (!val('ventaPresentacion') || val('ventaPresentacion') !== 'MATERIA_PRIMA') setVal('ventaPresentacion', 'MATERIA_PRIMA');
-    const item = resolveMateria(val('ventaProductoSearch')).item;
-    if (item && item.UnidadBase) setVal('ventaUnidad', item.UnidadBase);
+  if (tipo === 'PERFUME') {
+    setVentaUnidadBloqueada(true, 'gramos');
+    updateVentaPerfumeInfo();
   } else {
-    catInput?.setAttribute('list', 'catVentaList');
-    itemInput?.setAttribute('list', 'productosList');
-    if (catLabel) catLabel.textContent = 'Categoría venta *';
-    if (itemLabel) itemLabel.textContent = 'Perfume / esencia';
-    if (catHint) catHint.textContent = 'Ej.: Perfumes, por onzas, 1 2 y 3 o gramos.';
-    if (itemHint) itemHint.textContent = 'Puedes escribir nombre o ID. Si lo seleccionas, se descuentan gramos de esencia.';
-    if (eqHint) eqHint.textContent = 'Gr/ml que se restan del stock de perfume.';
-    if (val('ventaPresentacion') === 'MATERIA_PRIMA') setVal('ventaPresentacion', '1_ONZA');
+    setVentaUnidadBloqueada(false, unidadMateriaVentaActual());
   }
   updateVentaEquivalencia();
+}
+function limpiarCamposSobrantesVentaMateria() {
+  setVal('ventaPresentacion', 'MATERIA_PRIMA');
+  setVal('ventaEnvaseTamano', '');
+  setVal('ventaEnvaseSearch', '');
+  setVal('ventaDescontarMateria', 'NO');
+  setVal('ventaMateriaExtraSearch', '');
+  setVal('ventaMateriaExtraCantidad', 1);
+  setVal('ventaMateriaExtraUnidad', 'unidades');
+  setVal('ventaMateriaExtraLista', '');
+}
+function setVentaTipoUI(tipo) {
+  setVal('ventaTipo', tipo === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : 'PERFUME');
+  setVal('ventaProductoSearch', '');
+  setVal('ventaEnvaseSearch', '');
+  setVal('ventaMateriaExtraLista', '');
+  updateVentaMode();
+}
+function updateVentaMode() {
+  const tipo = currentVentaTipo();
+  const isPerfume = tipo === 'PERFUME';
+  const tabPerfume = document.getElementById('ventaTabPerfume');
+  const tabMateria = document.getElementById('ventaTabMateria');
+  if (tabPerfume && tabMateria) {
+    tabPerfume.className = isPerfume ? 'btn-primary' : 'btn-ghost';
+    tabMateria.className = isPerfume ? 'btn-ghost' : 'btn-primary';
+  }
+  setVal('ventaCategoriaSearch', isPerfume ? 'Perfumes' : 'Materia prima');
+  setVal('ventaPresentacion', isPerfume ? 'GRAMOS' : 'MATERIA_PRIMA');
+  setVentaUnidadBloqueada(isPerfume, isPerfume ? 'gramos' : unidadMateriaVentaActual());
+  const label = document.getElementById('ventaProductoLabel');
+  const input = document.getElementById('ventaProductoSearch');
+  const itemHint = document.getElementById('ventaProductoHint');
+  const eqHint = document.getElementById('ventaEquivalenciaHint');
+  const unidadHint = document.getElementById('ventaUnidadHint');
+  const modoInfo = document.getElementById('ventaModoInfo');
+  if (modoInfo) modoInfo.textContent = isPerfume
+    ? 'Sección perfumes: vende perfume/esencia, descuenta gramos del perfume, descuenta el ítem de envase stock y permite sumar materias primas adicionales al total.'
+    : 'Sección materias primas: vende una materia prima directa, toma su unidad de inventario y descuenta esa cantidad del stock. No usa envase ni materia prima adicional.';
+  if (label) label.textContent = isPerfume ? 'Perfume / esencia *' : 'Materia prima *';
+  if (input) { input.setAttribute('list', isPerfume ? 'productosList' : 'materiasList'); input.placeholder = isPerfume ? 'Escribe para buscar perfume' : 'Escribe para buscar materia prima'; }
+  if (itemHint) itemHint.textContent = isPerfume ? 'Busca el perfume. Al seleccionarlo se muestra nombre, categoría y stock.' : 'Busca la materia prima. Al seleccionarla se toma su unidad y stock.';
+  if (eqHint) eqHint.textContent = isPerfume ? 'Gramos que se restan del stock de perfume.' : 'Cantidad que se resta del stock de materia prima.';
+  if (unidadHint) unidadHint.textContent = isPerfume ? 'Fijo: gramos.' : 'Según la unidad de la materia prima seleccionada.';
+  setVentaRowVisible('ventaEnvaseWrap', isPerfume);
+  setVentaRowVisible('ventaDescontarMateriaWrap', isPerfume);
+  if (!isPerfume) { setVal('ventaEnvaseSearch',''); setVal('ventaDescontarMateria','NO'); setVal('ventaMateriaExtraLista',''); }
+  updateVentaPerfumeInfo();
+  toggleVentaMateriaExtraPanel();
+  updateVentaEnvaseFromPresentacion();
   updateVentaTotal();
 }
 function resolveVentaItem(value) {
   return currentVentaTipo() === 'MATERIA_PRIMA' ? resolveMateria(value) : resolveProducto(value);
+}
+function tipoPerfumeLabel(tipo) {
+  const raw = String(tipo || 'U').toUpperCase();
+  return ({ M:'Hombre', F:'Mujer', U:'Unisex', A:'Árabe' })[raw] || raw;
+}
+function updateVentaPerfumeInfo() {
+  const box = document.getElementById('ventaProductoInfo');
+  if (!box) return;
+  if (currentVentaTipo() !== 'PERFUME') {
+    const m = resolveMateria(val('ventaProductoSearch')).item;
+    box.textContent = m ? `Materia prima: ${m.Nombre} · Categoría: ${m.Categoria || 'Sin categoría'} · Stock: ${fmtNum(m.Stock)} ${m.UnidadBase || 'unidades'}` : '';
+    return;
+  }
+  const p = resolveProducto(val('ventaProductoSearch')).item;
+  box.textContent = p ? `Perfume: ${p.Fragancia} · Categoría: ${tipoPerfumeLabel(p.Tipo)} · Stock: ${fmtNum(p.Stock)} ${p.UnidadBase || 'gramos'}` : '';
+}
+function materiaStock(m) {
+  const sg = (state.stockGeneral || []).find(s => String(s.RelacionadoID || '') === String(m?.ID || ''));
+  return sg ? num(sg.Stock) : num(m?.Stock);
+}
+function isEnvaseMateria(m) {
+  const s = normal(`${m?.Nombre || ''} ${m?.Categoria || ''}`);
+  return /envase|frasco|atomizador|botella/.test(s) || normal(m?.Categoria || '').includes('envases');
+}
+function detectEnvaseTamano(m) {
+  const s = normal(`${m?.Nombre || ''} ${m?.Categoria || ''}`);
+  if (/\b1\b.*(onza|oz)|(?:onza|oz).*\b1\b/.test(s)) return '1_ONZA';
+  if (/\b2\b.*(onza|oz)|(?:onza|oz).*\b2\b/.test(s)) return '2_ONZAS';
+  if (/\b3\b.*(onza|oz)|(?:onza|oz).*\b3\b/.test(s)) return '3_ONZAS';
+  return '';
+}
+function envaseTamanoLabel(tamano) {
+  return ({ '1_ONZA':'1 onza', '2_ONZAS':'2 onzas', '3_ONZAS':'3 onzas' })[tamano] || '';
+}
+function envaseGramos(tamano) {
+  return ({ '1_ONZA':30, '2_ONZAS':60, '3_ONZAS':90 })[tamano] || 0;
+}
+function findEnvaseDisponible(tamano) {
+  const rows = (state.materias || []).filter(m => (m.Estado || 'ACTIVO') === 'ACTIVO' && isEnvaseMateria(m) && (!tamano || detectEnvaseTamano(m) === tamano));
+  rows.sort((a, b) => {
+    const catA = normal(a.Categoria || '') === 'envases' ? 1 : 0;
+    const catB = normal(b.Categoria || '') === 'envases' ? 1 : 0;
+    return (catB - catA) || (materiaStock(b) - materiaStock(a));
+  });
+  return rows.find(m => materiaStock(m) > 0) || rows[0] || null;
+}
+function updateVentaEnvaseFromPresentacion(force = false) {
+  if (currentVentaTipo() !== 'PERFUME') { setVal('ventaEnvaseSearch', ''); updateVentaEnvaseHint(); return; }
+  const actual = resolveMateria(val('ventaEnvaseSearch')).item;
+  const debeCambiar = force || !actual || !isEnvaseMateria(actual) || materiaStock(actual) <= 0;
+  if (debeCambiar) {
+    const found = findEnvaseDisponible('');
+    setVal('ventaEnvaseSearch', found ? searchLabel(found.ID, found.Nombre) : '');
+  }
+  updateVentaEnvaseHint();
+}
+function updateVentaEnvaseHint() {
+  const hint = document.getElementById('ventaEnvaseHint');
+  if (!hint) return;
+  const envase = resolveMateria(val('ventaEnvaseSearch')).item;
+  if (currentVentaTipo() !== 'PERFUME') { hint.textContent = ''; return; }
+  if (envase) {
+    hint.textContent = `Envase seleccionado: ${envase.Nombre} · Categoría: ${envase.Categoria || 'Envases'} · Stock: ${fmtNum(materiaStock(envase))} ${envase.UnidadBase || 'unidades'}`;
+  } else {
+    hint.textContent = 'No encontré envase con stock. Créalo en Materia prima con categoría Envases o selecciona uno manualmente.';
+  }
+}
+function toggleVentaMateriaExtraPanel() {
+  const panel = document.getElementById('ventaMateriaExtraPanel');
+  if (!panel) return;
+  const visible = currentVentaTipo() === 'PERFUME' && val('ventaDescontarMateria') === 'SI';
+  panel.classList.toggle('hidden', !visible);
+  renderVentaMateriaExtraLines();
+}
+function applyVentaMateriaUnidad() {
+  const item = resolveMateria(val('ventaMateriaExtraSearch')).item;
+  if (item?.UnidadBase) setVal('ventaMateriaExtraUnidad', item.UnidadBase);
+}
+function addPerfilInsumo(perfil, item, cantidad, unidad, concepto, modo = 'por_unidad') {
+  if (!item?.id || !num(cantidad)) return;
+  perfil.insumos ||= [];
+  if (!perfil.insumos.some(i => String(i.id) === String(item.id) && normal(i.concepto) === normal(concepto))) perfil.insumos.push({ id:item.id, nombre:item.nombre, cantidad:num(cantidad), unidad:unidad || 'unidades', modo, concepto });
+}
+function parseVentaMateriaExtraLines() {
+  return String(val('ventaMateriaExtraLista') || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
+    const parts = line.split('|').map(x => x.trim());
+    const item = resolveMateria(parts[0] || '');
+    const cantidad = num(parts[1]);
+    if (!item.id || !cantidad) return null;
+    return { id:item.id, nombre:item.nombre, cantidad, unidad:parts[2] || 'unidades', precio:num(parts[3]), modo:parts[4] || 'por_unidad', concepto:parts[5] || 'Materia prima adicional' };
+  }).filter(Boolean);
+}
+function setVentaMateriaExtraLines(items) {
+  const lines = (items || []).filter(i => i && i.id && num(i.cantidad)).map(i => `${searchLabel(i.id, i.nombre)} | ${num(i.cantidad)} | ${i.unidad || 'unidades'} | ${num(i.precio)} | ${i.modo || 'por_unidad'} | ${i.concepto || 'Materia prima adicional'}`);
+  setVal('ventaMateriaExtraLista', lines.join('\n'));
+  renderVentaMateriaExtraLines();
+}
+function addVentaMateriaExtraLine() {
+  const item = resolveMateria(val('ventaMateriaExtraSearch'));
+  const cantidad = num(val('ventaMateriaExtraCantidad'));
+  if (!item.id) return toast('Seleccione una materia prima válida.', 'warn');
+  if (!cantidad) return toast('Ingrese la cantidad de materia prima a descontar.', 'warn');
+  const items = parseVentaMateriaExtraLines();
+  items.push({ id:item.id, nombre:item.nombre, cantidad, unidad:val('ventaMateriaExtraUnidad') || item.item?.UnidadBase || 'unidades', precio:num(val('ventaMateriaExtraPrecio')), modo:'por_unidad', concepto:'Materia prima adicional' });
+  setVentaMateriaExtraLines(items);
+  setVal('ventaMateriaExtraSearch', '');
+  setVal('ventaMateriaExtraCantidad', 1);
+  setVal('ventaMateriaExtraUnidad', 'unidades');
+  setVal('ventaMateriaExtraPrecio', 0);
+  updateVentaTotal();
+}
+
+function removeVentaMateriaExtraLine(index) {
+  const items = parseVentaMateriaExtraLines();
+  items.splice(index, 1);
+  setVentaMateriaExtraLines(items);
+}
+function renderVentaMateriaExtraLines() {
+  const box = document.getElementById('ventaMateriaExtraItems');
+  if (!box) return;
+  const items = parseVentaMateriaExtraLines();
+  box.innerHTML = items.length ? items.map((i, idx) => `<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin:4px 0;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--card)"><span>${escapeHtml(i.nombre)} · ${fmtNum(i.cantidad)} ${escapeHtml(i.unidad || '')} · suma ${fmtMoney(num(i.precio))}</span><button type="button" class="btn-sm btn-danger" onclick="removeVentaMateriaExtraLine(${idx})">Quitar</button></div>`).join('') : 'Sin materia prima adicional agregada.';
+}
+function buildVentaPerfilConsumo(categoria, producto) {
+  const base = parsePerfilVenta(categoria?.PerfilVentaJSON) || { activo:false, insumos:[] };
+  const perfil = { ...base, activo:true, insumos:[...(base.insumos || [])] };
+  const envase = resolveMateria(val('ventaEnvaseSearch'));
+  if (envase.id) addPerfilInsumo(perfil, envase, 1, 'unidades', 'Envase', 'por_unidad');
+  if (val('ventaDescontarMateria') === 'SI') {
+    perfil.insumos.push(...parseVentaMateriaExtraLines());
+  }
+  if (!num(perfil.perfumePorUnidad) && num(val('ventaEquivalencia'))) perfil.perfumePorUnidad = num(val('ventaEquivalencia')) / Math.max(1, num(val('ventaCantidad')) || 1);
+  perfil.unidadPerfume = 'gramos';
+  return (num(perfil.perfumePorUnidad) || perfil.insumos.length) ? perfil : null;
 }
 
 function renderVentas() {
@@ -1473,46 +1666,50 @@ function renderVentas() {
   if (q) rows = rows.filter(r => normal(JSON.stringify(r)).includes(q));
   if (metodo) rows = rows.filter(r => String(r.MetodoPago || '').toLowerCase() === metodo);
   const body = document.getElementById('ventasBody');
-  body.innerHTML = rows.length ? rows.map(v => { const tipo = v.TipoVenta === 'MATERIA_PRIMA' || String(v.ProductoID || '').startsWith('MAT') ? 'MATERIA_PRIMA' : 'PERFUME'; return `<tr><td><b>${escapeHtml(v.ID)}</b></td><td>${escapeHtml(v.Fecha)}</td><td>${escapeHtml(v.Cliente)}</td><td>${escapeHtml(ventaTipoLabel(tipo))}</td><td>${escapeHtml(v.Categoria)}</td><td>${escapeHtml(v.Producto || '')}</td><td>${escapeHtml(v.Presentacion)}</td><td class="right">${fmtNum(v.Cantidad)} ${escapeHtml(v.UnidadMedida)}</td><td class="right"><b>${fmtMoney(v.Total)}</b></td><td>${pillMetodo(v.MetodoPago)}</td><td><div class="actions"><button class="btn-sm btn-ghost" onclick='editVenta(${encodeRow(v)})'>Editar</button><button class="btn-sm btn-danger" onclick="deleteRecord('deleteVenta','${escapeAttr(v.ID)}')">Eliminar</button></div></td></tr>`; }).join('') : '<tr><td colspan="11" class="empty">No hay ventas registradas.</td></tr>';
+  body.innerHTML = rows.length ? rows.map(v => {
+    const consumo = [v.Envase ? `Envase: ${v.Envase}` : '', v.MateriaExtra ? `M.P.: ${v.MateriaExtra}` : '', v.ConsumoPerfilResumen || ''].filter(Boolean).join(' | ');
+    return `<tr><td><b>${escapeHtml(v.ID)}</b></td><td>${escapeHtml(v.Fecha)}</td><td>${escapeHtml(v.Cliente)}</td><td>${escapeHtml(v.Producto || '')}</td><td>${escapeHtml(v.CategoriaPerfume || '')}</td><td>${escapeHtml(short(consumo, 80))}</td><td class="right">${fmtNum(v.Cantidad)}</td><td class="right">${fmtNum(v.EquivalenciaStock)} g</td><td class="right"><b>${fmtMoney(v.Total)}</b></td><td>${pillMetodo(v.MetodoPago)}</td><td><div class="actions"><button class="btn-sm btn-ghost" onclick='editVenta(${encodeRow(v)})'>Editar</button><button class="btn-sm btn-danger" onclick="deleteRecord('deleteVenta','${escapeAttr(v.ID)}')">Eliminar</button></div></td></tr>`;
+  }).join('') : '<tr><td colspan="11" class="empty">No hay ventas registradas.</td></tr>';
 }
 function editVenta(v) {
-  const tipo = v.TipoVenta === 'MATERIA_PRIMA' || String(v.ProductoID || '').startsWith('MAT') ? 'MATERIA_PRIMA' : 'PERFUME';
-  setVal('ventaTipo', tipo); updateVentaMode();
-  setVal('ventaId', v.ID); setVal('ventaFecha', v.Fecha || today()); setVal('ventaCliente', v.Cliente || ''); setVal('ventaCategoriaSearch', searchLabel(v.CategoriaID, v.Categoria)); setVal('ventaProductoSearch', searchLabel(v.ProductoID, v.Producto)); setVal('ventaPresentacion', v.Presentacion || (tipo === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : '1_ONZA')); setVal('ventaUnidad', v.UnidadMedida || (tipo === 'PERFUME' ? 'gramos' : 'unidades')); setVal('ventaCantidad', v.Cantidad || 1); setVal('ventaEquivalencia', v.EquivalenciaStock || 0); setVal('ventaPrecio', v.PrecioUnitario || 0); setVal('ventaIva', v.IVA || 0); setVal('ventaMetodo', String(v.MetodoPago || 'efectivo').toLowerCase()); setVal('ventaObs', v.Observaciones || ''); updateVentaMode(); updateVentaTotal();
+  const tipo = String(v.TipoVenta || 'PERFUME').toUpperCase() === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : 'PERFUME';
+  setVal('ventaTipo', tipo);
+  setVal('ventaCategoriaSearch', tipo === 'PERFUME' ? 'Perfumes' : (v.Categoria || 'Materia prima'));
+  setVal('ventaPresentacion', tipo === 'PERFUME' ? 'GRAMOS' : 'MATERIA_PRIMA');
+  updateVentaMode();
+  setVal('ventaId', v.ID); setVal('ventaFecha', v.Fecha || today()); setVal('ventaCliente', v.Cliente || ''); setVal('ventaProductoSearch', searchLabel(v.ProductoID, v.Producto)); setVal('ventaUnidad', v.UnidadMedida || (tipo === 'PERFUME' ? 'gramos' : 'unidades')); setVal('ventaCantidad', v.Cantidad || 1); setVal('ventaEquivalencia', v.EquivalenciaStock || 0); setVal('ventaPrecio', v.PrecioUnitario || 0); setVal('ventaIva', v.IVA || 0); setVal('ventaMetodo', String(v.MetodoPago || 'efectivo').toLowerCase()); setVal('ventaEnvaseTamano', ''); setVal('ventaEnvaseSearch', searchLabel(v.EnvaseID, v.Envase)); setVal('ventaDescontarMateria', (v.MateriaExtraJSON || v.ConsumoPerfilResumen) && tipo === 'PERFUME' ? 'SI' : 'NO'); setVal('ventaMateriaExtraSearch', ''); setVal('ventaMateriaExtraCantidad', 1); setVal('ventaMateriaExtraUnidad', 'unidades'); setVal('ventaMateriaExtraPrecio', 0); setVal('ventaMateriaExtraLista', v.MateriaExtraJSON || ''); setVal('ventaObs', v.Observaciones || ''); updateVentaMode(); toggleVentaMateriaExtraPanel(); updateVentaPerfumeInfo(); updateVentaEnvaseHint(); renderVentaMateriaExtraLines(); updateVentaTotal();
 }
-function clearVentaForm() { document.getElementById('ventaForm').reset(); setVal('ventaId',''); setVal('ventaFecha', today()); setVal('ventaTipo','PERFUME'); setVal('ventaCantidad',1); setVal('ventaIva',0); updateVentaMode(); updateVentaEquivalencia(); updateVentaTotal(); }
-function updateVentaEquivalencia() {
+function clearVentaForm() { document.getElementById('ventaForm').reset(); setVal('ventaId',''); setVal('ventaFecha', today()); setVal('ventaTipo','PERFUME'); setVal('ventaCategoriaSearch','Perfumes'); setVal('ventaPresentacion','GRAMOS'); setVal('ventaUnidad','gramos'); setVal('ventaCantidad',1); setVal('ventaEquivalencia',30); setVal('ventaIva',0); setVal('ventaEnvaseTamano',''); setVal('ventaEnvaseSearch',''); setVal('ventaDescontarMateria','NO'); setVal('ventaMateriaExtraSearch',''); setVal('ventaMateriaExtraCantidad',1); setVal('ventaMateriaExtraUnidad','unidades'); setVal('ventaMateriaExtraPrecio',0); setVal('ventaMateriaExtraLista',''); updateVentaMode(); toggleVentaMateriaExtraPanel(); updateVentaPerfumeInfo(); updateVentaEnvaseHint(); renderVentaMateriaExtraLines(); updateVentaTotal(); }
+function updateVentaEquivalencia(force = false) {
   const cant = num(val('ventaCantidad')) || 0;
-  const tipo = currentVentaTipo();
-  const pres = val('ventaPresentacion');
-  const unidad = val('ventaUnidad');
-  const catModulo = tipo === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : 'VENTA';
-  const cat = resolveCategoria(val('ventaCategoriaSearch'), catModulo).item;
-  const perfil = tipo === 'PERFUME' ? parsePerfilVenta(cat?.PerfilVentaJSON) : null;
-  let eq = cant;
-  if (tipo === 'MATERIA_PRIMA') eq = cant;
-  else if (perfil?.activo && num(perfil.perfumePorUnidad) > 0) eq = cant * num(perfil.perfumePorUnidad);
-  else {
-    if (pres === '1_ONZA') eq = cant * 30;
-    if (pres === '2_ONZAS') eq = cant * 60;
-    if (pres === '3_ONZAS') eq = cant * 90;
-    if (pres === 'GRAMOS' || unidad === 'gramos') eq = cant;
-    if (pres === 'ML' || unidad === 'ml') eq = cant;
-    if (pres === 'UNIDADES' && unidad === 'unidades') eq = cant;
-  }
+  if (currentVentaTipo() !== 'PERFUME') { setVal('ventaEquivalencia', cant); return; }
+  let eq = num(val('ventaEquivalencia')) || 0;
+  if (!eq || force) eq = cant || 30;
   setVal('ventaEquivalencia', eq);
 }
-function updateVentaTotal() { const subtotal = num(val('ventaCantidad')) * num(val('ventaPrecio')); const total = subtotal + (subtotal * num(val('ventaIva'))); setVal('ventaTotal', fmtMoney(total)); }
+function ventaMateriaExtraSubtotal() {
+  if (currentVentaTipo() !== 'PERFUME' || val('ventaDescontarMateria') !== 'SI') return 0;
+  const cantidadVenta = Math.max(1, num(val('ventaCantidad')) || 1);
+  return parseVentaMateriaExtraLines().reduce((t, i) => t + (num(i.cantidad) * num(i.precio) * cantidadVenta), 0);
+}
+function updateVentaTotal() { const subtotal = (num(val('ventaCantidad')) * num(val('ventaPrecio'))) + ventaMateriaExtraSubtotal(); const total = subtotal + (subtotal * num(val('ventaIva'))); setVal('ventaTotal', fmtMoney(total)); }
 async function saveVenta(button) {
+  updateVentaEnvaseFromPresentacion();
   updateVentaEquivalencia();
   const tipoVenta = currentVentaTipo();
-  const catModulo = tipoVenta === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : 'VENTA';
-  const cat = resolveCategoria(val('ventaCategoriaSearch'), catModulo); const prod = resolveVentaItem(val('ventaProductoSearch'));
-  const payload = { id: val('ventaId'), fecha: val('ventaFecha'), cliente: val('ventaCliente'), tipoVenta, categoriaId: cat.id, categoria: cat.nombre, productoId: prod.id, producto: prod.nombre, productoTipoInventario: tipoVenta, presentacion: val('ventaPresentacion'), unidadMedida: val('ventaUnidad'), cantidad: val('ventaCantidad'), equivalenciaStock: val('ventaEquivalencia'), precioUnitario: val('ventaPrecio'), iva: val('ventaIva'), metodoPago: val('ventaMetodo'), observaciones: val('ventaObs'), perfilVentaJson: tipoVenta === 'PERFUME' ? (cat.item?.PerfilVentaJSON || '') : '' };
-  if (!payload.fecha || !payload.categoria || !payload.cantidad || !payload.precioUnitario) return toast('Complete fecha, categoría, cantidad y precio.', 'warn');
-  if (!payload.productoId) return toast(tipoVenta === 'MATERIA_PRIMA' ? 'Seleccione una materia prima válida para descontar stock.' : 'Seleccione un perfume válido para descontar stock.', 'warn');
+  const isPerfume = tipoVenta === 'PERFUME';
+  const cat = isPerfume ? resolveCategoria('Perfumes', 'VENTA') : resolveCategoria('Materia prima', 'MATERIA_PRIMA');
+  const prod = isPerfume ? resolveProducto(val('ventaProductoSearch')) : resolveMateria(val('ventaProductoSearch'));
+  const perfilCompuesto = isPerfume ? buildVentaPerfilConsumo(cat.item, prod.item) : null;
+  const envase = isPerfume ? resolveMateria(val('ventaEnvaseSearch')) : { id:'', nombre:'' };
+  const payload = { id: val('ventaId'), fecha: val('ventaFecha'), cliente: val('ventaCliente'), tipoVenta, categoriaId: cat.id, categoria: isPerfume ? 'Perfumes' : (prod.item?.Categoria || 'Materia prima'), categoriaPerfume: isPerfume ? tipoPerfumeLabel(prod.item?.Tipo) : '', productoId: prod.id, producto: prod.nombre, productoTipoInventario: tipoVenta, presentacion: isPerfume ? '' : 'MATERIA_PRIMA', unidadMedida: isPerfume ? 'gramos' : (val('ventaUnidad') || prod.item?.UnidadBase || 'unidades'), cantidad: val('ventaCantidad'), equivalenciaStock: val('ventaEquivalencia'), precioUnitario: val('ventaPrecio'), iva: val('ventaIva'), metodoPago: val('ventaMetodo'), envaseTamano: '', envaseId: envase.id, envase: envase.nombre, materiaExtraId: '', materiaExtra: '', materiaExtraCantidad: '', materiaExtraUnidad: '', materiaExtraJson: isPerfume && val('ventaDescontarMateria') === 'SI' ? val('ventaMateriaExtraLista') : '', materiaExtraSubtotal: ventaMateriaExtraSubtotal(), observaciones: val('ventaObs'), perfilVentaJson: perfilCompuesto ? JSON.stringify(perfilCompuesto) : '' };
+  if (!payload.fecha || !payload.cantidad || !payload.precioUnitario) return toast('Complete fecha, cantidad y precio.', 'warn');
+  if (!payload.productoId) return toast(isPerfume ? 'Seleccione un perfume válido para descontar stock.' : 'Seleccione una materia prima válida para descontar stock.', 'warn');
+  if (!num(payload.equivalenciaStock)) return toast(isPerfume ? 'Ingrese los gramos que se restan del stock.' : 'Ingrese la cantidad que se resta del stock.', 'warn');
+  if (isPerfume && val('ventaEnvaseSearch') && !payload.envaseId) return toast('Seleccione un ítem de envase válido o deje el campo vacío.', 'warn');
   try { const res = await withButtonLoading(button, 'Guardando...', () => api('saveVenta', payload)); toast(res.message || 'Venta guardada.', 'ok'); clearVentaForm(); finishMutation('saveVenta', res, payload); } catch (err) { toast('No se pudo guardar la venta: ' + err.message, 'error'); }
 }
+
 
 function renderCompras() {
   const q = normal(val('buscarCompras')); const metodo = val('filtroCompraMetodo');
@@ -1575,15 +1772,14 @@ function renderCategorias() {
   const q = normal(val('buscarCategorias')); const modulo = val('filtroCategoriaModulo');
   let rows = state.categorias.slice(); if (q) rows = rows.filter(c => normal(JSON.stringify(c)).includes(q)); if (modulo) rows = rows.filter(c => c.Modulo === modulo);
   const body = document.getElementById('categoriasBody');
-  body.innerHTML = rows.length ? rows.map(c => `<tr><td><b>${escapeHtml(c.ID)}</b></td><td>${escapeHtml(c.Modulo)}</td><td>${escapeHtml(c.Nombre)}</td><td>${escapeHtml(c.UnidadSugerida)}</td><td class="right">${fmtMoney(c.PrecioBase)}</td><td>${escapeHtml(c.AfectaInventario || 'NO')}</td><td>${escapeHtml(c.PerfilVentaResumen || perfilVentaResumen(c.PerfilVentaJSON) || '')}</td><td>${escapeHtml(c.Estado || 'ACTIVO')}</td><td><div class="actions"><button class="btn-sm btn-ghost" onclick='editCategoria(${encodeRow(c)})'>Editar</button><button class="btn-sm btn-danger" onclick="deleteRecord('deleteCategoria','${escapeAttr(c.ID)}')">Eliminar</button></div></td></tr>`).join('') : '<tr><td colspan="9" class="empty">No hay categorías registradas.</td></tr>';
+  body.innerHTML = rows.length ? rows.map(c => `<tr><td><b>${escapeHtml(c.ID)}</b></td><td>${escapeHtml(c.Modulo)}</td><td>${escapeHtml(c.Nombre)}</td><td>${escapeHtml(c.UnidadSugerida)}</td><td class="right">${fmtMoney(c.PrecioBase)}</td><td>${escapeHtml(c.AfectaInventario || 'NO')}</td><td>${escapeHtml(c.Estado || 'ACTIVO')}</td><td><div class="actions"><button class="btn-sm btn-ghost" onclick='editCategoria(${encodeRow(c)})'>Editar</button><button class="btn-sm btn-danger" onclick="deleteRecord('deleteCategoria','${escapeAttr(c.ID)}')">Eliminar</button></div></td></tr>`).join('') : '<tr><td colspan="8" class="empty">No hay categorías registradas.</td></tr>';
 }
 function editCategoria(c) {
-  setVal('categoriaId', c.ID); setVal('categoriaModulo', c.Modulo || 'VENTA'); setVal('categoriaNombre', c.Nombre || ''); setVal('categoriaUnidad', c.UnidadSugerida || 'unidades'); setVal('categoriaPrecio', c.PrecioBase || 0); setVal('categoriaIva', c.IVA || 0); setVal('categoriaInventario', c.AfectaInventario || 'NO'); setVal('categoriaEstado', c.Estado || 'ACTIVO'); setVal('categoriaObs', c.Observaciones || ''); setCategoriaPerfilForm(c.PerfilVentaJSON || ''); toggleCategoriaPerfilPanel(); window.scrollTo({top:0, behavior:'smooth'});
+  setVal('categoriaId', c.ID); setVal('categoriaModulo', c.Modulo || 'VENTA'); setVal('categoriaNombre', c.Nombre || ''); setVal('categoriaUnidad', c.UnidadSugerida || 'unidades'); setVal('categoriaPrecio', c.PrecioBase || 0); setVal('categoriaIva', c.IVA || 0); setVal('categoriaInventario', c.AfectaInventario || 'NO'); setVal('categoriaEstado', c.Estado || 'ACTIVO'); setVal('categoriaObs', c.Observaciones || ''); window.scrollTo({top:0, behavior:'smooth'});
 }
-function clearCategoriaForm() { document.getElementById('categoriaForm').reset(); setVal('categoriaId',''); setVal('categoriaPrecio',0); setVal('categoriaIva',0); setCategoriaPerfilForm(''); toggleCategoriaPerfilPanel(); }
+function clearCategoriaForm() { document.getElementById('categoriaForm').reset(); setVal('categoriaId',''); setVal('categoriaPrecio',0); setVal('categoriaIva',0); }
 async function saveCategoria(button) {
-  const perfil = val('categoriaModulo') === 'VENTA' ? collectCategoriaPerfil() : { activo:false, insumos:[] };
-  const payload = { id: val('categoriaId'), modulo: val('categoriaModulo'), nombre: val('categoriaNombre'), unidadSugerida: val('categoriaUnidad'), precioBase: val('categoriaPrecio'), iva: val('categoriaIva'), afectaInventario: val('categoriaInventario'), estado: val('categoriaEstado'), observaciones: val('categoriaObs'), perfilVentaJson: JSON.stringify(perfil) };
+  const payload = { id: val('categoriaId'), modulo: val('categoriaModulo'), nombre: val('categoriaNombre'), unidadSugerida: val('categoriaUnidad'), precioBase: val('categoriaPrecio'), iva: val('categoriaIva'), afectaInventario: val('categoriaInventario'), estado: val('categoriaEstado'), observaciones: val('categoriaObs') };
   if (!payload.modulo || !payload.nombre) return toast('Complete módulo y nombre de categoría.', 'warn');
   try { const res = await withButtonLoading(button, 'Guardando...', () => api('saveCategoria', payload)); toast(res.message || 'Categoría guardada.', 'ok'); clearCategoriaForm(); finishMutation('saveCategoria', res, payload); } catch (err) { toast('No se pudo guardar la categoría: ' + err.message, 'error'); }
 }
@@ -1636,12 +1832,21 @@ function generateReport(showToast = true) {
 function renderReportFromRows(rows, showToast = true) {
   rows = (rows || []).map(normalizeReportRow);
   state.lastReport = rows;
-  const totalVentas = sum(rows.filter(r => r.Tipo === 'VENTA'), 'Total');
-  const totalCompras = sum(rows.filter(r => r.Tipo === 'COMPRA'), 'Total');
-  const totalGastos = sum(rows.filter(r => r.Tipo === 'GASTO'), 'Total');
-  const totalPagosEgreso = sum(rows.filter(r => r.Tipo === 'PAGO' && String(r.Signo || '').toUpperCase() !== 'INGRESO'), 'Total');
-  const totalPagosIngreso = sum(rows.filter(r => r.Tipo === 'PAGO' && String(r.Signo || '').toUpperCase() === 'INGRESO'), 'Total');
-  text('repRegistros', rows.length); text('repVentas', fmtMoney(totalVentas + totalPagosIngreso)); text('repCompras', fmtMoney(totalCompras)); text('repGastos', fmtMoney(totalGastos + totalPagosEgreso));
+  const ventasRows = rows.filter(r => r.Tipo === 'VENTA');
+  const comprasRows = rows.filter(r => r.Tipo === 'COMPRA');
+  const gastosRows = rows.filter(r => r.Tipo === 'GASTO');
+  const pagosEgresoRows = rows.filter(r => r.Tipo === 'PAGO' && String(r.Signo || '').toUpperCase() !== 'INGRESO');
+  const pagosIngresoRows = rows.filter(r => r.Tipo === 'PAGO' && String(r.Signo || '').toUpperCase() === 'INGRESO');
+  const totalVentas = sum(ventasRows, 'Total');
+  const totalCompras = sum(comprasRows, 'Total');
+  const totalGastos = sum(gastosRows, 'Total');
+  const totalPagosEgreso = sum(pagosEgresoRows, 'Total');
+  const totalPagosIngreso = sum(pagosIngresoRows, 'Total');
+  const ingresos = totalVentas + totalPagosIngreso;
+  const egresos = totalCompras + totalGastos + totalPagosEgreso;
+  const resultado = ingresos - egresos;
+  text('repRegistros', rows.length); text('repVentas', fmtMoney(ingresos)); text('repCompras', fmtMoney(totalCompras)); text('repGastos', fmtMoney(totalGastos + totalPagosEgreso)); text('repResultado', fmtMoney(resultado));
+  text('repRegVentas', ventasRows.length + ' registros'); text('repRegCompras', comprasRows.length + ' registros'); text('repRegGastos', gastosRows.length + ' registros');
   renderReportBreakdowns(rows, { totalVentas, totalCompras, totalGastos, totalPagosEgreso, totalPagosIngreso });
   renderReportCharts(rows, { totalVentas, totalCompras, totalGastos, totalPagosEgreso, totalPagosIngreso });
   const body = document.getElementById('repDetalle');
@@ -1685,7 +1890,11 @@ function excelSummaryTables(rows, totals) {
   const topItems = Object.entries(groupRows(rows.filter(r => r.Tipo === 'VENTA'), r => r.Item || r.Detalle || 'Sin ítem')).map(([label, list]) => [label, list.length, sum(list, 'Cantidad'), sum(list, 'Total')]).sort((a,b)=>b[3]-a[3]).slice(0, 20);
   const byStock = rows.filter(r => r.Tipo === 'STOCK').map(r => [r.Fecha, r.Categoria, r.Detalle, r.Cantidad, r.UnidadMedida, r.Referencia || '']);
   const stockActual = (state.stockGeneral || []).map(s => [s.ID, s.Nombre, s.TipoInventario, s.Categoria, s.UnidadMedida, num(s.Stock), num(s.StockMinimo), num(s.StockAlerta), getStockEstado(s)]).sort((a,b) => String(a[8]).localeCompare(String(b[8])) || a[5] - b[5]);
-  return { ingresos, egresos, resultado, byMetodo, byCategoria, byVentaTipo, topItems, byStock, stockActual };
+  const byModulo = reportModuleRows(rows);
+  const ventasClasificadas = reportClassifiedRows(rows, 'VENTA');
+  const comprasClasificadas = reportClassifiedRows(rows, 'COMPRA');
+  const gastosClasificados = reportClassifiedRows(rows, 'GASTO');
+  return { ingresos, egresos, resultado, byMetodo, byCategoria, byVentaTipo, topItems, byStock, stockActual, byModulo, ventasClasificadas, comprasClasificadas, gastosClasificados };
 }
 function excelBar(value, max) {
   const width = Math.max(3, Math.min(100, Math.abs(num(value)) / Math.max(1, Math.abs(num(max))) * 100));
@@ -1701,7 +1910,7 @@ function getReportRows() {
   state.ventas.forEach(v => {
     const tv = v.TipoVenta === 'MATERIA_PRIMA' || String(v.ProductoID || '').startsWith('MAT') ? 'Materia prima' : 'Perfume';
     const item = v.Producto || v.Cliente || v.Presentacion || '';
-    rows.push({ Tipo:'VENTA', Subtipo:tv, Item:item, ID:v.ID, Fecha:normalizeDateValue(v.Fecha) || v.Fecha || '', Categoria:v.Categoria || tv, Detalle:[tv, item, v.ConsumoPerfilResumen ? 'Insumos: ' + v.ConsumoPerfilResumen : ''].filter(Boolean).join(' · '), UnidadMedida:v.UnidadMedida, Cantidad:v.Cantidad, Total:v.Total, MetodoPago:v.MetodoPago, Signo:'INGRESO' });
+    rows.push({ Tipo:'VENTA', Subtipo:tv, Item:item, ID:v.ID, Fecha:normalizeDateValue(v.Fecha) || v.Fecha || '', Categoria:v.Categoria || tv, Detalle:[tv, v.CategoriaPerfume ? 'Cat. perfume: ' + v.CategoriaPerfume : '', item, v.Envase ? 'Envase: ' + v.Envase : '', v.MateriaExtra ? 'M.P.: ' + v.MateriaExtra : '', v.ConsumoPerfilResumen ? 'Insumos: ' + v.ConsumoPerfilResumen : ''].filter(Boolean).join(' · '), UnidadMedida:v.UnidadMedida, Cantidad:v.Cantidad, Total:v.Total, MetodoPago:v.MetodoPago, Signo:'INGRESO' });
   });
   state.compras.forEach(c => rows.push({ Tipo:'COMPRA', Subtipo:c.ProductoTipoInventario || '', Item:c.Producto || c.Categoria, ID:c.ID, Fecha:normalizeDateValue(c.Fecha) || c.Fecha || '', Categoria:c.Categoria, Detalle:c.Producto || c.Categoria, UnidadMedida:c.UnidadMedida, Cantidad:c.Cantidad, Total:c.Total, MetodoPago:c.MetodoPago, Signo:'EGRESO' }));
   state.gastos.forEach(g => rows.push({ Tipo:'GASTO', Subtipo:g.EstadoPago || '', Item:g.Concepto || g.Categoria, ID:g.ID, Fecha:normalizeDateValue(g.Fecha) || g.Fecha || '', Categoria:g.Categoria, Detalle:g.Concepto || g.Categoria, UnidadMedida:g.UnidadMedida, Cantidad:g.Cantidad, Total:g.Total, MetodoPago:g.MetodoPago, Signo:'EGRESO' }));
@@ -1717,6 +1926,31 @@ function getReportRows() {
     return true;
   }).sort((a,b) => String(a.Fecha).localeCompare(String(b.Fecha)) || String(a.Tipo).localeCompare(String(b.Tipo)));
 }
+function reportClassifiedRows(rows, tipo) {
+  return Object.entries(groupRows((rows || []).filter(r => r.Tipo === tipo), r => r.Categoria || 'Sin categoría'))
+    .map(([categoria, list]) => [categoria, list.length, sum(list, 'Cantidad'), sum(list, 'Total')])
+    .sort((a,b) => b[3] - a[3] || String(a[0]).localeCompare(String(b[0])));
+}
+function reportModuleRows(rows) {
+  const ventas = (rows || []).filter(r => r.Tipo === 'VENTA');
+  const compras = (rows || []).filter(r => r.Tipo === 'COMPRA');
+  const gastos = (rows || []).filter(r => r.Tipo === 'GASTO');
+  const pagosIngreso = (rows || []).filter(r => r.Tipo === 'PAGO' && String(r.Signo || '').toUpperCase() === 'INGRESO');
+  const pagosEgreso = (rows || []).filter(r => r.Tipo === 'PAGO' && String(r.Signo || '').toUpperCase() !== 'INGRESO');
+  const stock = (rows || []).filter(r => r.Tipo === 'STOCK');
+  return [
+    ['Ventas', ventas.length, sum(ventas, 'Cantidad'), sum(ventas, 'Total')],
+    ['Compras', compras.length, sum(compras, 'Cantidad'), sum(compras, 'Total')],
+    ['Gastos', gastos.length, sum(gastos, 'Cantidad'), sum(gastos, 'Total')],
+    ['Pagos ingreso', pagosIngreso.length, sum(pagosIngreso, 'Cantidad'), sum(pagosIngreso, 'Total')],
+    ['Pagos egreso', pagosEgreso.length, sum(pagosEgreso, 'Cantidad'), sum(pagosEgreso, 'Total')],
+    ['Movimientos stock', stock.length, sum(stock, 'Cantidad'), 0]
+  ];
+}
+function reportClassifiedTableHtml(rows, tipo) {
+  const data = reportClassifiedRows(rows, tipo);
+  return data.length ? data.map(r => `<tr><td>${escapeHtml(r[0])}</td><td class="right">${r[1]}</td><td class="right">${fmtNum(r[2])}</td><td class="right"><b>${fmtMoney(r[3])}</b></td></tr>`).join('') : '<tr><td colspan="4" class="empty">Sin registros para este módulo.</td></tr>';
+}
 function renderReportBreakdowns(rows, totals) {
   const ingresos = totals.totalVentas + totals.totalPagosIngreso;
   const egresos = totals.totalCompras + totals.totalGastos + totals.totalPagosEgreso;
@@ -1724,8 +1958,19 @@ function renderReportBreakdowns(rows, totals) {
   const periodo = `${val('repDesde') || 'Inicio'} a ${val('repHasta') || 'hoy'}`;
   const resumen = document.getElementById('repResumenGeneral');
   if (resumen) resumen.innerHTML = [
-    ['Periodo seleccionado', periodo], ['Ingresos', fmtMoney(ingresos)], ['Egresos', fmtMoney(egresos)], ['Resultado neto', fmtMoney(resultado)], ['Ventas registradas', rows.filter(r => r.Tipo === 'VENTA').length], ['Movimientos de stock', rows.filter(r => r.Tipo === 'STOCK').length]
+    ['Periodo seleccionado', periodo], ['Ingresos', fmtMoney(ingresos)], ['Egresos', fmtMoney(egresos)], ['Resultado neto', fmtMoney(resultado)], ['Ventas registradas', rows.filter(r => r.Tipo === 'VENTA').length], ['Compras registradas', rows.filter(r => r.Tipo === 'COMPRA').length], ['Gastos registrados', rows.filter(r => r.Tipo === 'GASTO').length], ['Movimientos de stock', rows.filter(r => r.Tipo === 'STOCK').length]
   ].map(([a,b]) => `<div class="mini-row"><span>${escapeHtml(a)}</span><b>${escapeHtml(b)}</b></div>`).join('');
+  const moduloBody = document.getElementById('repModuloResumen');
+  if (moduloBody) {
+    const moduleRows = reportModuleRows(rows);
+    moduloBody.innerHTML = moduleRows.map(r => `<tr><td>${escapeHtml(r[0])}</td><td class="right">${r[1]}</td><td class="right">${fmtNum(r[2])}</td><td class="right"><b>${r[0] === 'Movimientos stock' ? '-' : fmtMoney(r[3])}</b></td></tr>`).join('');
+  }
+  const ventasClas = document.getElementById('repVentasClasificadas');
+  if (ventasClas) ventasClas.innerHTML = reportClassifiedTableHtml(rows, 'VENTA');
+  const comprasClas = document.getElementById('repComprasClasificadas');
+  if (comprasClas) comprasClas.innerHTML = reportClassifiedTableHtml(rows, 'COMPRA');
+  const gastosClas = document.getElementById('repGastosClasificados');
+  if (gastosClas) gastosClas.innerHTML = reportClassifiedTableHtml(rows, 'GASTO');
   const metodoBox = document.getElementById('repMetodoResumen');
   if (metodoBox) {
     const byMetodo = groupRows(rows.filter(r => r.MetodoPago), r => String(r.MetodoPago || 'sin método').toLowerCase());
@@ -1747,11 +1992,12 @@ function groupRows(rows, getter) { return (rows || []).reduce((acc, row) => { co
 
 
 function getReportFilterPayload() {
+  const categoriaResuelta = resolveCategoria(val('repCategoria'));
   return {
-    desde: val('repDesde'),
-    hasta: val('repHasta'),
+    desde: normalizeDateValue(val('repDesde')) || '',
+    hasta: normalizeDateValue(val('repHasta')) || '',
     tipo: val('repTipo') || 'TODOS',
-    categoria: val('repCategoria'),
+    categoria: clean(categoriaResuelta.nombre || val('repCategoria')),
     metodo: val('repMetodo')
   };
 }
@@ -1808,6 +2054,18 @@ function downloadReportCsv() {
   else toast('El navegador bloqueó la descarga del CSV.', 'error');
 }
 
+async function openReportDrive(button) {
+  await withButtonLoading(button, 'Abriendo...', async () => {
+    try {
+      window.open(MASTER_DRIVE_REPORT_URL, '_blank');
+      toast('Abriendo el Google Sheets principal en Drive.', 'ok');
+    } catch (err) {
+      console.error('Error abriendo Drive:', err);
+      toast('No se pudo abrir el enlace de Drive.', 'error');
+    }
+  });
+}
+
 async function downloadReportExcel(button) {
   await withButtonLoading(button, 'Generando...', async () => {
     generateReport(false);
@@ -1817,6 +2075,7 @@ async function downloadReportExcel(button) {
     if (canUseBackend) {
       try {
         const res = await api('generateExcelReport', payload);
+        if (res && res.url) { state.lastReportDriveUrl = res.url; state.lastReportSpreadsheetId = res.spreadsheetId || ''; }
         if (res && res.base64) {
           const downloaded = downloadBase64File(res.base64, res.filename || `informe_general_perfumeria_${Date.now()}.xlsx`, res.mimeType);
           if (!downloaded && res.url) window.open(res.url, '_blank');
@@ -1853,12 +2112,19 @@ function buildLocalReportExcelHtml() {
   const maxMetodo = Math.max(1, ...stats.byMetodo.map(x => x[2]));
   const maxCategoria = Math.max(1, ...stats.byCategoria.map(x => x[3]));
   let html = `<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif}table{border-collapse:collapse;margin-bottom:18px;width:100%}th{background:#0f766e;color:#fff}th,td{border:1px solid #cbd5e1;padding:7px;text-align:left}.right{text-align:right}.title{font-size:22px;font-weight:bold;margin:0 0 12px}.sub{color:#475569;margin:0 0 16px}.section{font-size:16px;font-weight:bold;background:#f1f5f9}<\/style><\/head><body>`;
-  html += `<div class="title">Informe general perfumería</div><div class="sub">Periodo: ${xl(val('repDesde') || 'Inicio')} a ${xl(val('repHasta') || 'Hoy')} · Generado: ${xl(new Date().toLocaleString())}</div>`;
+  const filtros = getReportFilterPayload();
+  html += `<div class="title">Informe general perfumería</div><div class="sub">Periodo: ${xl(filtros.desde || 'Inicio')} a ${xl(filtros.hasta || 'Hoy')} · Generado: ${xl(new Date().toLocaleString())}</div>`;
+  html += `<table><tr><th>Filtro</th><th>Valor aplicado</th></tr><tr><td>Desde</td><td>${xl(filtros.desde || 'Inicio')}</td></tr><tr><td>Hasta</td><td>${xl(filtros.hasta || 'Hoy')}</td></tr><tr><td>Tipo</td><td>${xl(filtros.tipo || 'TODOS')}</td></tr><tr><td>Categoría</td><td>${xl(filtros.categoria || 'Todas')}</td></tr><tr><td>Método de pago</td><td>${xl(filtros.metodo || 'Todos')}</td></tr></table>`;
   html += `<table><tr><th>Indicador</th><th>Valor</th></tr><tr><td>Ingresos</td><td class="right">${stats.ingresos}</td></tr><tr><td>Egresos</td><td class="right">${stats.egresos}</td></tr><tr><td>Resultado neto</td><td class="right">${stats.resultado}</td></tr><tr><td>Registros del informe</td><td class="right">${rows.length}</td></tr><tr><td>Total ventas</td><td class="right">${totalVentas}</td></tr><tr><td>Total compras</td><td class="right">${totalCompras}</td></tr><tr><td>Total gastos</td><td class="right">${totalGastos}</td></tr></table>`;
+  const table4 = (title, headers, data, empty = 'Sin datos') => `<table><tr><th colspan="${headers.length}">${title}</th></tr><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>${data.length ? data.map(r => `<tr>${r.map((c,i) => `<td class="${i>0 ? 'right' : ''}">${i === 3 ? num(c) : xl(c)}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${headers.length}">${empty}</td></tr>`}</table>`;
+  html += table4('Totales por módulo', ['Módulo','Registros','Cantidad','Total'], stats.byModulo);
+  html += table4('Ventas clasificadas', ['Categoría','Registros','Cantidad','Total'], stats.ventasClasificadas);
+  html += table4('Compras clasificadas', ['Categoría','Registros','Cantidad','Total'], stats.comprasClasificadas);
+  html += table4('Gastos clasificados', ['Categoría','Registros','Cantidad','Total'], stats.gastosClasificados);
   html += `<table><tr><th colspan="4">Gráfico general de flujo</th></tr><tr><td>Ingresos</td><td class="right">${stats.ingresos}</td><td>${excelBar(stats.ingresos, Math.max(stats.ingresos, stats.egresos, Math.abs(stats.resultado)))}</td><td></td></tr><tr><td>Egresos</td><td class="right">${stats.egresos}</td><td>${excelBar(stats.egresos, Math.max(stats.ingresos, stats.egresos, Math.abs(stats.resultado)))}</td><td></td></tr><tr><td>Resultado</td><td class="right">${stats.resultado}</td><td>${excelBar(stats.resultado, Math.max(stats.ingresos, stats.egresos, Math.abs(stats.resultado)))}</td><td></td></tr></table>`;
   html += '<table><tr><th colspan="4">Ventas / movimientos por método de pago</th></tr><tr><th>Método</th><th>Registros</th><th>Total</th><th>Gráfico</th></tr>' + (stats.byMetodo.length ? stats.byMetodo.map(r => `<tr><td>${xl(r[0])}</td><td class="right">${r[1]}</td><td class="right">${r[2]}</td><td>${excelBar(r[2], maxMetodo)}</td></tr>`).join('') : '<tr><td colspan="4">Sin datos</td></tr>') + '</table>';
   html += '<table><tr><th colspan="5">Detalle estadístico por categoría</th></tr><tr><th>Tipo</th><th>Categoría</th><th>Registros</th><th>Total</th><th>Gráfico</th></tr>' + (stats.byCategoria.length ? stats.byCategoria.map(r => `<tr><td>${xl(r[0])}</td><td>${xl(r[1])}</td><td class="right">${r[2]}</td><td class="right">${r[3]}</td><td>${excelBar(r[3], maxCategoria)}</td></tr>`).join('') : '<tr><td colspan="5">Sin datos</td></tr>') + '</table>';
-  html += '<table><tr><th colspan="5">Ventas por tipo</th></tr><tr><th>Tipo de venta</th><th>Registros</th><th>Cantidad</th><th>Total</th><th>Gráfico</th></tr>' + (stats.byVentaTipo.length ? stats.byVentaTipo.map(r => `<tr><td>${xl(r[0])}</td><td class="right">${r[1]}</td><td class="right">${num(r[2])}</td><td class="right">${num(r[3])}</td><td>${excelBar(r[3], Math.max(1, ...stats.byVentaTipo.map(x => x[3])))}</td></tr>`).join('') : '<tr><td colspan="5">Sin ventas</td></tr>') + '</table>';
+  html += '<table><tr><th colspan="5">Resumen de ventas</th></tr><tr><th>Clase</th><th>Registros</th><th>Cantidad</th><th>Total</th><th>Gráfico</th></tr>' + (stats.byVentaTipo.length ? stats.byVentaTipo.map(r => `<tr><td>${xl(r[0])}</td><td class="right">${r[1]}</td><td class="right">${num(r[2])}</td><td class="right">${num(r[3])}</td><td>${excelBar(r[3], Math.max(1, ...stats.byVentaTipo.map(x => x[3])))}</td></tr>`).join('') : '<tr><td colspan="5">Sin ventas</td></tr>') + '</table>';
   html += '<table><tr><th colspan="5">Top productos o insumos vendidos</th></tr><tr><th>Ítem</th><th>Registros</th><th>Cantidad</th><th>Total</th><th>Gráfico</th></tr>' + (stats.topItems.length ? stats.topItems.map(r => `<tr><td>${xl(r[0])}</td><td class="right">${r[1]}</td><td class="right">${num(r[2])}</td><td class="right">${num(r[3])}</td><td>${excelBar(r[3], Math.max(1, ...stats.topItems.map(x => x[3])))}</td></tr>`).join('') : '<tr><td colspan="5">Sin ventas</td></tr>') + '</table>';
   html += '<table><tr><th colspan="9">Estado actual del inventario / stock</th></tr><tr><th>ID</th><th>Ítem</th><th>Tipo</th><th>Categoría</th><th>Unidad</th><th>Stock</th><th>Mínimo</th><th>Alerta</th><th>Estado</th></tr>' + (stats.stockActual.length ? stats.stockActual.map(r => `<tr><td>${xl(r[0])}</td><td>${xl(r[1])}</td><td>${xl(r[2])}</td><td>${xl(r[3])}</td><td>${xl(r[4])}</td><td class="right">${num(r[5])}</td><td class="right">${num(r[6])}</td><td class="right">${num(r[7])}</td><td>${xl(r[8])}</td></tr>`).join('') : '<tr><td colspan="9">Sin stock registrado</td></tr>') + '</table>';
   html += '<table><tr><th colspan="6">Movimientos de stock / inventario</th></tr><tr><th>Fecha</th><th>Movimiento</th><th>Ítem</th><th>Cantidad</th><th>Unidad</th><th>Referencia</th></tr>' + (stats.byStock.length ? stats.byStock.map(r => `<tr><td>${xl(r[0])}</td><td>${xl(r[1])}</td><td>${xl(r[2])}</td><td class="right">${num(r[3])}</td><td>${xl(r[4])}</td><td>${xl(r[5])}</td></tr>`).join('') : '<tr><td colspan="6">Sin movimientos de stock</td></tr>') + '</table>';
@@ -1878,17 +2144,19 @@ function renderHistorial() {
 
 function resolveProducto(value) {
   const raw = clean(value); if (!raw) return { id:'', nombre:'' };
-  const q = normal(raw); const found = state.productos.find(p => q === normal(`${p.ID} - ${p.Fragancia}`) || q === normal(p.ID) || q === normal(p.Fragancia) || normal(`${p.ID} ${p.Fragancia}`).includes(q));
-  return found ? { id: found.ID, nombre: found.Fragancia, tipoInventario:'PERFUME', item: found } : { id:'', nombre: raw, tipoInventario:'' };
+  const main = clean(raw.split('|')[0]);
+  const q = normal(main); const found = state.productos.find(p => q === normal(`${p.ID} - ${p.Fragancia}`) || q === normal(p.ID) || q === normal(p.Fragancia) || normal(`${p.ID} ${p.Fragancia}`).includes(q));
+  return found ? { id: found.ID, nombre: found.Fragancia, tipoInventario:'PERFUME', item: found } : { id:'', nombre: main || raw, tipoInventario:'' };
 }
 function resolveInventario(value) {
   const raw = clean(value); if (!raw) return { id:'', nombre:'', tipoInventario:'' };
-  const q = normal(raw);
+  const main = clean(raw.split('|')[0]);
+  const q = normal(main);
   const p = state.productos.find(x => q === normal(`${x.ID} - ${x.Fragancia}`) || q === normal(x.ID) || q === normal(x.Fragancia) || normal(`${x.ID} ${x.Fragancia}`).includes(q));
   if (p) return { id:p.ID, nombre:p.Fragancia, tipoInventario:'PERFUME', item:p };
   const m = state.materias.find(x => q === normal(`${x.ID} - ${x.Nombre}`) || q === normal(x.ID) || q === normal(x.Nombre) || normal(`${x.ID} ${x.Nombre}`).includes(q));
   if (m) return { id:m.ID, nombre:m.Nombre, tipoInventario:'MATERIA_PRIMA', item:m };
-  return { id:'', nombre: raw, tipoInventario:'' };
+  return { id:'', nombre: main || raw, tipoInventario:'' };
 }
 function resolveCategoria(value, modulo = '') {
   const raw = clean(value); if (!raw) return { id:'', nombre:'' };
@@ -1899,9 +2167,10 @@ function resolveCategoria(value, modulo = '') {
 
 function resolveMateria(value) {
   const raw = clean(value); if (!raw) return { id:'', nombre:'', item:null };
-  const q = normal(raw);
+  const main = clean(raw.split('|')[0]);
+  const q = normal(main);
   const m = state.materias.find(x => q === normal(`${x.ID} - ${x.Nombre}`) || q === normal(x.ID) || q === normal(x.Nombre) || normal(`${x.ID} ${x.Nombre}`).includes(q));
-  return m ? { id:m.ID, nombre:m.Nombre, item:m } : { id:'', nombre:raw, item:null };
+  return m ? { id:m.ID, nombre:m.Nombre, item:m } : { id:'', nombre:main || raw, item:null };
 }
 function parsePerfilVenta(raw) {
   if (!raw) return null;
@@ -1978,7 +2247,7 @@ function applyVentaProfileDefaults(cat) {
   if (num(perfil.perfumePorUnidad) > 0) setVal('ventaEquivalencia', num(val('ventaCantidad')) * num(perfil.perfumePorUnidad));
 }
 
-function applyProductDefaultPrices(e) { const resolved = e.target.id === 'compraProductoSearch' ? resolveInventario(e.target.value) : resolveVentaItem(e.target.value); if (!resolved.item) return; if (e.target.id === 'ventaProductoSearch') { if (currentVentaTipo() === 'MATERIA_PRIMA' && resolved.item.UnidadBase) setVal('ventaUnidad', resolved.item.UnidadBase); updateVentaEquivalencia(); updateVentaTotal(); } }
+function applyProductDefaultPrices(e) { const resolved = e.target.id === 'compraProductoSearch' ? resolveInventario(e.target.value) : resolveVentaItem(e.target.value); if (!resolved.item) return; if (e.target.id === 'ventaProductoSearch') { if (currentVentaTipo() === 'MATERIA_PRIMA' && resolved.item.UnidadBase) setVal('ventaUnidad', resolved.item.UnidadBase); updateVentaPerfumeInfo(); updateVentaEquivalencia(); updateVentaTotal(); } }
 function applyCategoryDefaults(e) {
   const moduleMap = { ventaCategoriaSearch:(currentVentaTipo() === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : 'VENTA'), compraCategoriaSearch:'COMPRA', gastoCategoriaSearch:'GASTO', pagoCategoriaSearch:'PAGO', materiaCategoriaSearch:'MATERIA_PRIMA' };
   const c = resolveCategoria(e.target.value, moduleMap[e.target.id]).item;
@@ -1987,7 +2256,6 @@ function applyCategoryDefaults(e) {
     setVal('ventaUnidad', c.UnidadSugerida || 'unidades');
     if (!num(val('ventaPrecio'))) setVal('ventaPrecio', c.PrecioBase || 0);
     setVal('ventaIva', c.IVA || 0);
-    if (currentVentaTipo() === 'PERFUME') applyVentaProfileDefaults(c);
     updateVentaEquivalencia(); updateVentaTotal();
   }
   if (e.target.id === 'compraCategoriaSearch') { setVal('compraUnidad', c.UnidadSugerida || 'unidades'); if (!num(val('compraCosto'))) setVal('compraCosto', c.PrecioBase || 0); setVal('compraIva', c.IVA || 0); setVal('compraActualizaInventario', c.AfectaInventario || 'NO'); updateCompraTotal(); }
@@ -1998,7 +2266,7 @@ function searchLabel(id, name) { if (!id && !name) return ''; return id ? `${id}
 function encodeRow(row) { return escapeHtml(JSON.stringify(row)); }
 function escapeAttr(v) { return String(v ?? '').replace(/'/g, '&#039;').replace(/"/g, '&quot;'); }
 
-function pillTipo(t) { const raw = String(t || 'U').toUpperCase(); const labels = { M:'Hombre', F:'Mujer', U:'Unisex' }; const c = raw.toLowerCase(); return `<span class="pill ${c}">${escapeHtml(labels[raw] || raw)}</span>`; }
+function pillTipo(t) { const raw = String(t || 'U').toUpperCase(); const labels = { M:'Hombre', F:'Mujer', U:'Unisex', A:'Árabe' }; const c = raw.toLowerCase(); return `<span class="pill ${c}">${escapeHtml(labels[raw] || raw)}</span>`; }
 function pillMetodo(m) { const x = String(m || '').toLowerCase(); const cls = x === 'nequi' ? 'nequi' : x === 'transferencia' ? 'transfer' : 'cash'; return `<span class="pill ${cls}">${escapeHtml(x || 'efectivo')}</span>`; }
 function historyPill(a) { a = String(a || '').toUpperCase(); const cls = a === 'ELIMINAR' ? 'out' : a === 'AGREGAR' ? 'in' : 'neutral'; return `<span class="pill ${cls}">${escapeHtml(a)}</span>`; }
 function historyRestoreButton(h) {
@@ -2090,8 +2358,8 @@ function initDemoIfEmpty() {
   if (state.productos.length || state.categorias.length) return;
   state.categorias = SEED_CATEGORIAS.map((c,i) => ({ ID:'CAT' + String(i+1).padStart(3,'0'), ...c, FechaCreacion: today() }));
   state.productos = [
-    { ID:'PROD001', Fragancia:'GOOD GIRL F', Tipo:'F', UnidadBase:'gramos', Stock:250, StockMinimo:30, Estado:'ACTIVO', Observaciones:'Demo' },
-    { ID:'PROD002', Fragancia:'YARA LATTAFA F', Tipo:'F', UnidadBase:'gramos', Stock:180, StockMinimo:30, Estado:'ACTIVO', Observaciones:'Demo' }
+    { ID:'PROD001', Fragancia:'GOOD GIRL F', Tipo:'F', Categoria:'Mujer', FechaInventario:today(), UnidadBase:'gramos', Stock:250, StockMinimo:30, Estado:'ACTIVO', Observaciones:'Demo' },
+    { ID:'PROD002', Fragancia:'YARA LATTAFA F', Tipo:'A', Categoria:'Árabe', FechaInventario:today(), UnidadBase:'gramos', Stock:180, StockMinimo:30, Estado:'ACTIVO', Observaciones:'Demo' }
   ];
 }
 function demoApi(action, payload) {
@@ -2125,7 +2393,7 @@ function demoApi(action, payload) {
   if (action === 'ping') return ok({ message:'Modo local de prueba activo' });
   if (action === 'setup' || action === 'seedCategorias') { seedDemoCategorias(db); save(); return ok({ message:'Categorías base cargadas en modo local' }); }
   if (action === 'getInitialData') return ok({ productos:db.productos, materiasPrimas:db.materias || [], ventas:db.ventas, compras:db.compras, gastos:db.gastos, pagos:db.pagos || [], categorias:db.categorias, historial:db.historial, stockGeneral:db.stockGeneral || [], stockMovimientos:db.stockMovimientos || [], personalizacion:{...DEFAULT_PERSONALIZACION, ...getLocalPersonalizacion()} });
-  if (action === 'saveProduct') { const id = payload.id || next(db.productos,'PROD',3); const idx = db.productos.findIndex(x => x.ID === id); const before = idx >= 0 ? {...db.productos[idx]} : null; const item = { ID:id, Fragancia:clean(payload.fragancia).toUpperCase(), Tipo:payload.tipo || 'U', UnidadBase:'gramos', Stock:num(payload.stock), StockMinimo:num(payload.stockMinimo), Estado:payload.estado || 'ACTIVO', Observaciones:payload.observaciones || '' }; if (idx >= 0) db.productos[idx] = item; else db.productos.push(item); syncStock(item, 'PERFUME'); addHistory(idx >= 0 ? 'EDITAR':'AGREGAR','Inventario',id,item.Fragancia,before,item); save(); return ok({message:'Perfume guardado en modo local', producto:item}); }
+  if (action === 'saveProduct') { const id = payload.id || next(db.productos,'PROD',3); const idx = db.productos.findIndex(x => x.ID === id); const before = idx >= 0 ? {...db.productos[idx]} : null; const item = { ID:id, Fragancia:clean(payload.fragancia).toUpperCase(), Tipo:String(payload.tipo || 'U').toUpperCase(), Categoria:payload.categoria || tipoPerfumeLabel(payload.tipo), FechaInventario:payload.fechaInventario || today(), UnidadBase:'gramos', Stock:num(payload.stock), StockMinimo:num(payload.stockMinimo), Estado:payload.estado || 'ACTIVO', Observaciones:payload.observaciones || '' }; if (idx >= 0) db.productos[idx] = item; else db.productos.push(item); syncStock(item, 'PERFUME'); addHistory(idx >= 0 ? 'EDITAR':'AGREGAR','Inventario',id,item.Fragancia,before,item); save(); return ok({message:'Perfume guardado en modo local', producto:item}); }
   if (action === 'deleteProduct') { const idx = db.productos.findIndex(x => x.ID === payload.id); if (idx >= 0) { const before = db.productos[idx]; db.productos.splice(idx,1); addHistory('ELIMINAR','Inventario perfumes',payload.id,before.Fragancia,before,null); save(); } return ok({message:'Perfume eliminado en modo local'}); }
   if (action === 'saveMateria') { db.materias ||= []; const id = payload.id || next(db.materias,'MAT',3); const idx = db.materias.findIndex(x => x.ID === id); const before = idx >= 0 ? {...db.materias[idx]} : null; const item = { ID:id, Nombre:clean(payload.nombre).toUpperCase(), CategoriaID:payload.categoriaId || '', Categoria:payload.categoria || '', UnidadBase:payload.unidadBase || 'unidades', Stock:num(payload.stock), StockMinimo:num(payload.stockMinimo), Color:payload.color || '', Estado:payload.estado || 'ACTIVO', Observaciones:payload.observaciones || '' }; if (idx >= 0) db.materias[idx] = item; else db.materias.push(item); syncStock(item, 'MATERIA_PRIMA'); addHistory(idx >= 0 ? 'EDITAR':'AGREGAR','Inventario materia prima',id,item.Nombre,before,item); save(); return ok({message:'Materia prima guardada en modo local', materia:item}); }
   if (action === 'deleteMateria') { db.materias ||= []; const idx = db.materias.findIndex(x => x.ID === payload.id); if (idx >= 0) { const before = db.materias[idx]; db.materias.splice(idx,1); addHistory('ELIMINAR','Inventario materia prima',payload.id,before.Nombre,before,null); save(); } return ok({message:'Materia prima eliminada en modo local'}); }
@@ -2135,12 +2403,14 @@ function demoApi(action, payload) {
     const before = idx >= 0 ? {...db.ventas[idx]} : null;
     if (before) { applyStock(before.ProductoID, num(before.EquivalenciaStock)); applyConsumoLocal(parsePerfilVenta(before.ConsumoPerfilJSON) || [], 1); }
     const tipoVenta = payload.tipoVenta === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : 'PERFUME';
-    const subtotal = num(payload.cantidad) * num(payload.precioUnitario);
+    const materiaExtraSubtotal = tipoVenta === 'PERFUME' ? num(payload.materiaExtraSubtotal) : 0;
+    const subtotal = (num(payload.cantidad) * num(payload.precioUnitario)) + materiaExtraSubtotal;
     const total = subtotal + subtotal * num(payload.iva);
     const perfil = tipoVenta === 'PERFUME' ? perfilCategoriaLocal(payload) : null;
     let equivalencia = num(payload.equivalenciaStock) || num(payload.cantidad);
     if (tipoVenta === 'PERFUME' && perfil?.activo && num(perfil.perfumePorUnidad) > 0) equivalencia = num(perfil.perfumePorUnidad) * num(payload.cantidad);
-    const item = { ID:id, Fecha:payload.fecha, Hora:new Date().toLocaleTimeString(), Cliente:payload.cliente || '', TipoVenta:tipoVenta, CategoriaID:payload.categoriaId || '', Categoria:payload.categoria || '', ProductoID:payload.productoId || '', Producto:payload.producto || '', Presentacion:payload.presentacion || (tipoVenta === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : ''), UnidadMedida:payload.unidadMedida || '', Cantidad:num(payload.cantidad), EquivalenciaStock:equivalencia, PrecioUnitario:num(payload.precioUnitario), Subtotal:subtotal, IVA:num(payload.iva), Total:total, MetodoPago:payload.metodoPago || 'efectivo', Observaciones:payload.observaciones || '' };
+    const unidadLocal = tipoVenta === 'PERFUME' ? 'gramos' : (payload.unidadMedida || 'unidades');
+    const item = { ID:id, Fecha:payload.fecha, Hora:new Date().toLocaleTimeString(), Cliente:payload.cliente || '', TipoVenta:tipoVenta, CategoriaID:payload.categoriaId || '', Categoria:payload.categoria || 'Perfumes', CategoriaPerfume:tipoVenta === 'PERFUME' ? (payload.categoriaPerfume || '') : '', ProductoID:payload.productoId || '', Producto:payload.producto || '', Presentacion:tipoVenta === 'MATERIA_PRIMA' ? 'MATERIA_PRIMA' : (payload.presentacion || ''), EnvaseTamano:tipoVenta === 'PERFUME' ? (payload.envaseTamano || '') : '', EnvaseID:tipoVenta === 'PERFUME' ? (payload.envaseId || '') : '', Envase:tipoVenta === 'PERFUME' ? (payload.envase || '') : '', MateriaExtraID:tipoVenta === 'PERFUME' ? (payload.materiaExtraId || '') : '', MateriaExtra:tipoVenta === 'PERFUME' ? (payload.materiaExtra || '') : '', MateriaExtraCantidad:tipoVenta === 'PERFUME' ? num(payload.materiaExtraCantidad) : 0, MateriaExtraUnidad:tipoVenta === 'PERFUME' ? (payload.materiaExtraUnidad || '') : '', MateriaExtraJSON:tipoVenta === 'PERFUME' ? (payload.materiaExtraJson || '') : '', MateriaExtraSubtotal:tipoVenta === 'PERFUME' ? materiaExtraSubtotal : 0, UnidadMedida:unidadLocal, Cantidad:num(payload.cantidad), EquivalenciaStock:equivalencia, PrecioUnitario:num(payload.precioUnitario), Subtotal:subtotal, IVA:num(payload.iva), Total:total, MetodoPago:payload.metodoPago || 'efectivo', Observaciones:payload.observaciones || '' };
     const consumo = tipoVenta === 'PERFUME' ? consumoLocal(item, perfil) : [];
     item.ConsumoPerfilJSON = consumo.length ? JSON.stringify(consumo) : '';
     item.ConsumoPerfilResumen = resumenConsumoLocal(consumo);
@@ -2167,7 +2437,7 @@ function demoApi(action, payload) {
   }
   if (action === 'deletePago') { db.pagos ||= []; const idx = db.pagos.findIndex(x => x.ID === payload.id); if (idx >= 0) { const before = db.pagos[idx]; db.pagos.splice(idx,1); addHistory('ELIMINAR','Pagos',payload.id,before.Concepto,before,null); save(); } return ok({message:'Pago eliminado en modo local'}); }
   if (action === 'sincronizarSistema') { save(); return ok({message:'Relaciones sincronizadas en modo local'}); }
-  if (action === 'saveCategoria') { const id = payload.id || next(db.categorias,'CAT',3); const idx = db.categorias.findIndex(x => x.ID === id); const before = idx >= 0 ? {...db.categorias[idx]} : null; const perfil = parsePerfilVenta(payload.perfilVentaJson); const perfilJson = perfil && (perfil.activo || num(perfil.perfumePorUnidad) || (perfil.insumos || []).length) ? JSON.stringify(perfil) : ''; const item = { ID:id, Modulo:payload.modulo, Nombre:payload.nombre, UnidadSugerida:payload.unidadSugerida || 'unidades', PrecioBase:num(payload.precioBase), IVA:num(payload.iva), AfectaInventario:payload.afectaInventario || 'NO', Estado:payload.estado || 'ACTIVO', Observaciones:payload.observaciones || '', PerfilVentaJSON:perfilJson, PerfilVentaResumen:perfilJson ? perfilVentaResumen(perfil) : '', FechaCreacion:today() }; if (idx >= 0) db.categorias[idx]=item; else db.categorias.push(item); addHistory(idx >= 0 ? 'EDITAR':'AGREGAR','Categorías',id,item.Nombre,before,item); save(); return ok({message:'Categoría guardada en modo local', categoria:item}); }
+  if (action === 'saveCategoria') { const id = payload.id || next(db.categorias,'CAT',3); const idx = db.categorias.findIndex(x => x.ID === id); const before = idx >= 0 ? {...db.categorias[idx]} : null; const item = { ID:id, Modulo:payload.modulo, Nombre:payload.nombre, UnidadSugerida:payload.unidadSugerida || 'unidades', PrecioBase:num(payload.precioBase), IVA:num(payload.iva), AfectaInventario:payload.afectaInventario || 'NO', Estado:payload.estado || 'ACTIVO', Observaciones:payload.observaciones || '', PerfilVentaJSON:'', PerfilVentaResumen:'', FechaCreacion:today() }; if (idx >= 0) db.categorias[idx]=item; else db.categorias.push(item); addHistory(idx >= 0 ? 'EDITAR':'AGREGAR','Categorías',id,item.Nombre,before,item); save(); return ok({message:'Categoría guardada en modo local', categoria:item}); }
   if (action === 'deleteCategoria') { const idx = db.categorias.findIndex(x => x.ID === payload.id); if (idx >= 0) { const before = db.categorias[idx]; db.categorias.splice(idx,1); addHistory('ELIMINAR','Categorías',payload.id,before.Nombre,before,null); save(); } return ok({message:'Categoría eliminada en modo local'}); }
 
   if (action === 'saveStockItem') { db.stockGeneral ||= []; const id = payload.id || next(db.stockGeneral,'STK',4); const idx = db.stockGeneral.findIndex(x => x.ID === id); const before = idx >= 0 ? {...db.stockGeneral[idx]} : null; const item = { ID:id, Nombre:clean(payload.nombre).toUpperCase(), TipoInventario:payload.tipoInventario || 'MATERIA_PRIMA', RelacionadoID:payload.relacionadoId || '', Categoria:payload.categoria || '', Color:payload.color || '', UnidadMedida:payload.unidadMedida || 'unidades', Stock:num(payload.stock), StockMinimo:num(payload.stockMinimo), StockAlerta:num(payload.stockAlerta), EstadoSemaforo:'', Estado:payload.estado || 'ACTIVO', Observaciones:payload.observaciones || '' }; item.EstadoSemaforo = getStockEstado(item); if (idx >= 0) db.stockGeneral[idx]=item; else db.stockGeneral.push(item); addHistory(idx >= 0 ? 'EDITAR':'AGREGAR','Stock general',id,item.Nombre,before,item); save(); return ok({message:'Stock guardado en modo local', stock:item}); }
@@ -2178,7 +2448,7 @@ function demoApi(action, payload) {
   if (action === 'resetSettings') { saveLocalPersonalizacion(DEFAULT_PERSONALIZACION); return ok({ message:'Tema restaurado', personalizacion:DEFAULT_PERSONALIZACION }); }
   return ok();
 }
-function initDemoStorage() { if (localStorage.getItem('contablePerfumeriaDemo')) return; const db = { productos: [], materias: [], ventas: [], compras: [], gastos: [], pagos: [], categorias: [], historial: [], stockGeneral: [], stockMovimientos: [] }; seedDemoCategorias(db); db.productos.push({ ID:'PROD001', Fragancia:'GOOD GIRL F', Tipo:'F', UnidadBase:'gramos', Stock:250, StockMinimo:30, Estado:'ACTIVO', Observaciones:'Demo' }); db.materias.push({ ID:'MAT001', Nombre:'ESENCIA BASE', CategoriaID:'', Categoria:'Esencias', UnidadBase:'gramos', Stock:500, StockMinimo:50, Color:'transparente', Estado:'ACTIVO', Observaciones:'Demo' }); db.stockGeneral.push({ ID:'STK0001', Nombre:'GOOD GIRL F', TipoInventario:'PERFUME', RelacionadoID:'PROD001', Categoria:'Perfumes', Color:'', UnidadMedida:'gramos', Stock:250, StockMinimo:30, StockAlerta:80, EstadoSemaforo:'VERDE', Estado:'ACTIVO', Observaciones:'Demo' }); db.stockGeneral.push({ ID:'STK0002', Nombre:'ESENCIA BASE', TipoInventario:'MATERIA_PRIMA', RelacionadoID:'MAT001', Categoria:'Esencias', Color:'transparente', UnidadMedida:'gramos', Stock:500, StockMinimo:50, StockAlerta:120, EstadoSemaforo:'VERDE', Estado:'ACTIVO', Observaciones:'Demo' }); localStorage.setItem('contablePerfumeriaDemo', JSON.stringify(db)); }
+function initDemoStorage() { if (localStorage.getItem('contablePerfumeriaDemo')) return; const db = { productos: [], materias: [], ventas: [], compras: [], gastos: [], pagos: [], categorias: [], historial: [], stockGeneral: [], stockMovimientos: [] }; seedDemoCategorias(db); db.productos.push({ ID:'PROD001', Fragancia:'GOOD GIRL F', Tipo:'F', Categoria:'Mujer', FechaInventario:today(), UnidadBase:'gramos', Stock:250, StockMinimo:30, Estado:'ACTIVO', Observaciones:'Demo' }); db.materias.push({ ID:'MAT001', Nombre:'ESENCIA BASE', CategoriaID:'', Categoria:'Esencias', UnidadBase:'gramos', Stock:500, StockMinimo:50, Color:'transparente', Estado:'ACTIVO', Observaciones:'Demo' }); db.materias.push({ ID:'MAT002', Nombre:'ENVASE 1 ONZA', CategoriaID:'', Categoria:'Envases 1 onza', UnidadBase:'unidades', Stock:100, StockMinimo:10, Color:'transparente', Estado:'ACTIVO', Observaciones:'Demo' }); db.materias.push({ ID:'MAT003', Nombre:'ENVASE 2 ONZAS', CategoriaID:'', Categoria:'Envases 2 onzas', UnidadBase:'unidades', Stock:80, StockMinimo:10, Color:'transparente', Estado:'ACTIVO', Observaciones:'Demo' }); db.materias.push({ ID:'MAT004', Nombre:'ENVASE 3 ONZAS', CategoriaID:'', Categoria:'Envases 3 onzas', UnidadBase:'unidades', Stock:60, StockMinimo:10, Color:'transparente', Estado:'ACTIVO', Observaciones:'Demo' }); db.stockGeneral.push({ ID:'STK0001', Nombre:'GOOD GIRL F', TipoInventario:'PERFUME', RelacionadoID:'PROD001', Categoria:'Perfumes', Color:'', UnidadMedida:'gramos', Stock:250, StockMinimo:30, StockAlerta:80, EstadoSemaforo:'VERDE', Estado:'ACTIVO', Observaciones:'Demo' }); db.stockGeneral.push({ ID:'STK0002', Nombre:'ESENCIA BASE', TipoInventario:'MATERIA_PRIMA', RelacionadoID:'MAT001', Categoria:'Esencias', Color:'transparente', UnidadMedida:'gramos', Stock:500, StockMinimo:50, StockAlerta:120, EstadoSemaforo:'VERDE', Estado:'ACTIVO', Observaciones:'Demo' }); db.stockGeneral.push({ ID:'STK0003', Nombre:'ENVASE 1 ONZA', TipoInventario:'MATERIA_PRIMA', RelacionadoID:'MAT002', Categoria:'Envases 1 onza', Color:'transparente', UnidadMedida:'unidades', Stock:100, StockMinimo:10, StockAlerta:25, EstadoSemaforo:'VERDE', Estado:'ACTIVO', Observaciones:'Demo' }); db.stockGeneral.push({ ID:'STK0004', Nombre:'ENVASE 2 ONZAS', TipoInventario:'MATERIA_PRIMA', RelacionadoID:'MAT003', Categoria:'Envases 2 onzas', Color:'transparente', UnidadMedida:'unidades', Stock:80, StockMinimo:10, StockAlerta:25, EstadoSemaforo:'VERDE', Estado:'ACTIVO', Observaciones:'Demo' }); db.stockGeneral.push({ ID:'STK0005', Nombre:'ENVASE 3 ONZAS', TipoInventario:'MATERIA_PRIMA', RelacionadoID:'MAT004', Categoria:'Envases 3 onzas', Color:'transparente', UnidadMedida:'unidades', Stock:60, StockMinimo:10, StockAlerta:25, EstadoSemaforo:'VERDE', Estado:'ACTIVO', Observaciones:'Demo' }); localStorage.setItem('contablePerfumeriaDemo', JSON.stringify(db)); }
 function seedDemoCategorias(db) { db.categorias ||= []; SEED_CATEGORIAS.forEach(seed => { if (!db.categorias.some(c => c.Modulo === seed.Modulo && normal(c.Nombre) === normal(seed.Nombre))) db.categorias.push({ ID:'CAT' + String(db.categorias.length + 1).padStart(3,'0'), ...seed, FechaCreacion:today() }); }); }
 
 async function savePersonalizacion(button) { const settings = { ...DEFAULT_PERSONALIZACION, ...collectPersonalizacionForm() }; try { const res = await withButtonLoading(button, 'Guardando...', () => api('saveSettings', { settings })); state.personalizacion = { ...DEFAULT_PERSONALIZACION, ...(res.personalizacion || settings) }; applyTheme(state.personalizacion); renderPersonalizacionForm(); renderAll(); toast(res.message || 'Personalización guardada.', 'ok'); } catch (err) { toast('No se pudo guardar la personalización: ' + err.message, 'error'); } }
